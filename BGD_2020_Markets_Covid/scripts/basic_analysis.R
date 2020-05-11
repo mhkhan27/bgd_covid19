@@ -16,7 +16,7 @@ create_csv <- c("yes","no")[1]
 
 # data_read ---------------------------------------------------------------
 
-cleaned_df <- read.csv("inputs/02_cleaned_data/market_assessment_recoding.csv", stringsAsFactors = FALSE,
+cleaned_df <- read.csv("inputs/02_cleaned_data/recoded_data/2020_05_10_reach_bgd_market_assessment_cleaned_r2.csv", stringsAsFactors = FALSE,
                  na.strings = c("", " ", NA))
 # indv <- read.csv("inputs/01_daily_data/indv.csv", stringsAsFactors = FALSE,
                  # na.strings = c("", " ", NA))
@@ -33,14 +33,10 @@ col_not_to_analyze <- c("days_of_stock_of_rice", "restocking_time_of_rice", "day
                         "restocking_time_of_lentils", "days_of_stock_of_leafy_greens",
                         "restocking_time_of_leafy_greens", "days_of_stock_of_bananas",
                         "restocking_time_of_bananas", "days_of_stock_of_eggs", "restocking_time_of_eggs",
-                        "days_of_stock_of_fish", "restocking_time_of_fish", "days_of_stock_of_soap",
+                        "days_of_stock_of_dry_fish", "restocking_time_of_dry_fish", "days_of_stock_of_soap",
                         "restocking_time_of_soap", "days_of_stock_of_washing_powder",
-                        "restocking_time_of_washing_powder", "rice_sale_in_past_week","chicken_sale_in_past_week",
-                        "oil_sale_in_past_week", "lentils_sale_in_past_week", "leafy_greens_sale_in_past_week",
-                        "bananas_sale_in_past_week", "eggs_sale_in_past_week", "fish_sale_in_past_week",
-                        "soap_sale_in_past_week", "washing_powder_sale_in_past_week",
-                        "paracetamol_sale_in_past_week", "tarpaulin_sale_in_past_week", "ki_code"
-                        ,"X","X_uuid","survey_date", "survey_start","end_survey")
+                        "restocking_time_of_washing_powder","ki_code","informed_consent"
+                        ,"X","X_uuid","survey_date", "survey_start","end_survey","instance_name")
 
 col_to_analyze <- data_for_analysis %>% select(-col_not_to_analyze) %>% dplyr::select(-contains("_other"))   %>% colnames()
 
@@ -61,7 +57,9 @@ dfsvy$variables$upazilla<- forcats::fct_expand(dfsvy$variables$upazilla,c( "ukhi
 dfsvy$variables$sell_tarpaulin<- forcats::fct_expand(dfsvy$variables$sell_tarpaulin,c( "no", "yes"))
 dfsvy$variables$sell_paracetamol<- forcats::fct_expand(dfsvy$variables$sell_paracetamol,c( "no", "yes"))
 
-cols_to_sell <- c("sell_tarpaulin","sell_paracetamol")
+cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit",
+                  "lentils_unit","leafy_greens_unit","bananas_unit",
+                  "soap_unit","washing_powder_unit","chicken_unit")
 
 dfsvy$variables<-dfsvy$variables %>%
   mutate_at(.vars=cols_to_sell, .funs=forcats::fct_expand,c("no","yes")
@@ -72,9 +70,11 @@ dfsvy$variables$customer_visits_change<- forcats::fct_expand(dfsvy$variables$cus
 
 cols_to_times <- c("i.restocking_time_of_lentils","i.days_of_stock_of_leafy_greens",
                    "i.restocking_time_of_bananas","i.days_of_stock_of_bananas",
-                   "i.restocking_time_of_eggs","i.restocking_time_of_fish",
+                   "i.restocking_time_of_eggs","i.restocking_time_of_dry_fish",
                    "i.restocking_time_of_soap","i.days_of_stock_of_chicken",
-                   "i.restocking_time_of_chicken")
+                   "i.restocking_time_of_chicken","i.days_of_stock_of_rice",
+                   "i.restocking_time_of_rice","i.restocking_time_of_cooking_oil",
+                   "i.restocking_time_of_leafy_greens","i.restocking_time_of_washing_powder")
 
 dfsvy$variables<-dfsvy$variables %>%
   mutate_at(.vars=cols_to_times, .funs=forcats::fct_expand,c("0_3_days","4_7_days","7_and_more")

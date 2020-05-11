@@ -5,17 +5,49 @@ rm(list = ls())
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(stringr)
 
 items<- c("food_item","non_food_item")[2]
 
 # path --------------------------------------------------------------------
 
-outputfolder_box <-"outputs/03_charts/01_box/"
+outputfolder_box <-"BGD_2020_Markets_Covid/outputs/datamerge/graphs/"
 
 # data_preparation ---------------------------------------------------------------
 
-cleaned_df <- read.csv("inputs/02_cleaned_data/market_assessment_recoding.csv", stringsAsFactors = FALSE,
-                       na.strings = c("", " ", NA))
+round_1 <- read.csv("inputs/01_daily_data/BGD_covid_19_market_monitoring_roiund1.csv", stringsAsFactors = FALSE,
+                    na.strings = c("", " ", NA)) %>% mutate(
+                      cheapest_price_for_4mx5m_of_chicken = NA
+                    )
+round_2 <- read.csv("inputs/01_daily_data/BGD_covid_19_market_monitoring_roiund2.csv", stringsAsFactors = FALSE,
+                    na.strings = c("", " ", NA))
+
+old_cols_names <-c("sell_fish", "fish_unit", "fish_unit_other", "fish_unit_other_price",
+                   "cheapest_price_for_1kg__of_fish", "fish_sale_in_past_week",
+                   "days_of_stock_of_fish", "restocking_time_of_fish")
+
+new_cols_names <- c("sell_dry_fish", "dry_fish_unit", "dry_fish_unit_other", "dry_fish_unit_other_price",
+                    "cheapest_price_for_1kg__of_dry_fish", "dry_fish_sale_in_past_week",
+                    "days_of_stock_of_dry_fish", "restocking_time_of_dry_fish")
+
+round_1 <-round_1 %>%  rename_at(vars(old_cols_names),funs(str_replace(.,old_cols_names,new_cols_names)))
+
+
+
+
+cols_for_line_graph <- c("X_uuid","price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
+                         "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
+                         "cheapest_price_for_12__of_eggs", "cheapest_price_for_1kg__of_dry_fish",
+                         "cheapest_price_for_4mx5m_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
+                         "cheapest_price_for_0_5l_of_bleachwashing_powder",
+                         "cheapest_price_for_12_of_paracetamol")
+
+round_1_clean <-round_1[cols_for_line_graph]
+round_2_clean <- round_2[cols_for_line_graph]
+
+cleaned_df <- rbind(round_1_clean,round_2_clean)
+
+
 date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = FALSE,
                      na.strings = c("", " ", NA)) %>% select(-"reported_date")
 
@@ -26,10 +58,10 @@ data_with_round<- cleaned_df %>%  left_join(date_log,"X_uuid") #add_round
 
 if (items  =="food_item"){
 
-  cols_needed <- c("price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
+cols_needed <- c("price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
                    "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
-                   "cheapest_price_for_12__of_eggs", "cheapest_price_for_1kg__of_fish",
-                   "cheapest_price_for_12_of_chicken","round")
+                   "cheapest_price_for_12__of_eggs", "cheapest_price_for_1kg__of_dry_fish",
+                   "cheapest_price_for_4mx5m_of_chicken","round")
 
   data_with_cols <- data_with_round[cols_needed]
 
@@ -58,10 +90,11 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
                                                             if_else(grepl("fish",key),"#eeadad",
                                                                     if_else(grepl("chicken",key),"#ee5658","error",NULL
                                                                     )))))))))
+
   final_data_for_chart$color <-factor(final_data_for_chart$color,unique(final_data_for_chart$color))
   final_data_for_chart$name <-factor(final_data_for_chart$name,unique(final_data_for_chart$name))
 
-  ymax <- max(final_data_for_chart$value)
+  ymax <- max(final_data_for_chart$value,na.rm = T)+25
 
   ggplot(final_data_for_chart, aes(x = round, y = value,group =name)) +
     ylim (0,ymax)+
@@ -80,13 +113,13 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
           legend.key.size = unit(1, 'lines'),
           legend.key = element_rect(fill = NA),
           legend.text.align = 0)+ ylab("Price (BDT)")+
-    scale_color_manual(values = as.character(final_data_for_chart$color) %>% dput)
+    scale_color_manual(values = as.character(unique(final_data_for_chart$color)) %>% dput)
 
 
   ggsave(path = outputfolder_box,filename ="line_food_item.jpg" ,width=12.9213,height=7,units="cm",scale = 1.8)
 }
 # Non food item -----------------------------------------------------------
-if (items  =="food_item"){
+if (items  =="non_food_item"){
 
 cols_needed <- c("cheapest_price_for_100g_soap_bar_of_soap", "cheapest_price_for_0_5l_of_bleachwashing_powder",
                    "cheapest_price_for_12_of_paracetamol","round")
@@ -106,12 +139,12 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
 
     color = if_else(grepl("soap_bar",key),"#d0cdbc",
                     if_else(grepl("bleachwashing",key),"#a1c5a0",
-                            if_else(grepl("paracetamol",key),"#595959", "error",NULL))))
+                            if_else(grepl("paracetamol",key),"#eeadad", "error",NULL))))
 
   final_data_for_chart$color <-factor(final_data_for_chart$color,unique(final_data_for_chart$color))
   final_data_for_chart$name <-factor(final_data_for_chart$name,unique(final_data_for_chart$name))
 
-  ymax <- max(final_data_for_chart$value)
+  ymax <- max(final_data_for_chart$value,na.rm = T)+10
 
   ggplot(final_data_for_chart, aes(x = round, y = value,group =name)) +
     ylim (0,ymax)+
@@ -130,7 +163,7 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
           legend.key.size = unit(1, 'lines'),
           legend.key = element_rect(fill = NA),
           legend.text.align = 0)+ ylab("Price (BDT)")+
-    scale_color_manual(values = as.character(final_data_for_chart$color) %>% dput)
+    scale_color_manual(values = as.character(unique(final_data_for_chart$color)) %>% dput)
 
 
   ggsave(path = outputfolder_box,filename ="line_non_food_item.jpg" ,width=12.9213,height=7,units="cm",scale = 1.8)

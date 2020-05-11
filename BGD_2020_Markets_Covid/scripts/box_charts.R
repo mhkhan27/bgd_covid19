@@ -7,7 +7,7 @@ library(ggplot2)
 library(tidyr)
 library(forcats)
 
-items<- c("food_item","non_food_item")[2]
+items<- c("food_item","non_food_item")[1]
 current_round <- "round 1"
 
 # function ----------------------------------------------------------------
@@ -23,7 +23,7 @@ fun_min <- function(x){
 
 # path --------------------------------------------------------------------
 
-outputfolder_box <-"outputs/03_charts/01_box/"
+outputfolder_box <-"BGD_2020_Markets_Covid/outputs/datamerge/graphs/"
 
 # read_data ---------------------------------------------------------------
 
