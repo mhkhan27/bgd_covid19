@@ -1,3 +1,6 @@
+#new round data should be added first before run it.
+#this script might be change in future
+
 rm(list = ls())
 
 # library -----------------------------------------------------------------
@@ -6,8 +9,9 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(stringr)
+library(Hmisc)
 
-items<- c("food_item","non_food_item")[2]
+items<- c("food_item","non_food_item")[1]
 
 # path --------------------------------------------------------------------
 
@@ -15,29 +19,22 @@ outputfolder_box <-"BGD_2020_Markets_Covid/outputs/datamerge/graphs/"
 
 # data_preparation ---------------------------------------------------------------
 
-round_1 <- read.csv("inputs/01_daily_data/BGD_covid_19_market_monitoring_roiund1.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA)) %>% mutate(
-                      cheapest_price_for_4mx5m_of_chicken = NA
-                    )
-round_2 <- read.csv("inputs/01_daily_data/BGD_covid_19_market_monitoring_roiund2.csv", stringsAsFactors = FALSE,
+round_1 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_04_23_reach_bgd_market_assessment_cleaned_r1.csv", stringsAsFactors = FALSE,
                     na.strings = c("", " ", NA))
 
-old_cols_names <-c("sell_fish", "fish_unit", "fish_unit_other", "fish_unit_other_price",
-                   "cheapest_price_for_1kg__of_fish", "fish_sale_in_past_week",
-                   "days_of_stock_of_fish", "restocking_time_of_fish")
+round_2 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_12_reach_bgd_markets_assessment_cleaned_r2.csv", stringsAsFactors = FALSE,
+                    na.strings = c("", " ", NA))
 
-new_cols_names <- c("sell_dry_fish", "dry_fish_unit", "dry_fish_unit_other", "dry_fish_unit_other_price",
-                    "cheapest_price_for_1kg__of_dry_fish", "dry_fish_sale_in_past_week",
-                    "days_of_stock_of_dry_fish", "restocking_time_of_dry_fish")
+old_cols_names <-c("cheapest_price_for_1kg__of_fish","cheapest_price_for_12_of_chicken")
+
+new_cols_names <-c("dry_fish_sale_in_past_week","cheapest_price_for_4mx5m_of_chicken")
 
 round_1 <-round_1 %>%  rename_at(vars(old_cols_names),funs(str_replace(.,old_cols_names,new_cols_names)))
 
 
-
-
 cols_for_line_graph <- c("X_uuid","price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
                          "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
-                         "cheapest_price_for_12__of_eggs", "cheapest_price_for_1kg__of_dry_fish",
+                         "cheapest_price_for_12__of_eggs", "dry_fish_sale_in_past_week",
                          "cheapest_price_for_4mx5m_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
                          "cheapest_price_for_0_5l_of_bleachwashing_powder",
                          "cheapest_price_for_12_of_paracetamol")
@@ -53,6 +50,8 @@ date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = F
 
 data_with_round<- cleaned_df %>%  left_join(date_log,"X_uuid") #add_round
 
+data_with_round$round <- capitalize(data_with_round$round)
+
 
 # food_item -------------------------------------------------------------
 
@@ -60,7 +59,7 @@ if (items  =="food_item"){
 
 cols_needed <- c("price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
                    "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
-                   "cheapest_price_for_12__of_eggs", "cheapest_price_for_1kg__of_dry_fish",
+                   "cheapest_price_for_12__of_eggs", "dry_fish_sale_in_past_week",
                    "cheapest_price_for_4mx5m_of_chicken","round")
 
   data_with_cols <- data_with_round[cols_needed]
@@ -73,12 +72,12 @@ cols_needed <- c("price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_pric
 
 final_data_for_chart <- final_group_gather %>% dplyr::mutate(
     name = if_else(grepl("price_of_1kg",key),"Rice",
-                   if_else(grepl("cooking_oil",key),"Oil",
+                   if_else(grepl("cooking_oil",key),"Cooking oil",
                            if_else(grepl("lentils",key),"Lentils",
                                    if_else(grepl("leafy_greens",key),"Leafy greens",
                                            if_else(grepl("eggs",key),"Egg",
                                                    if_else(grepl("bananas",key),"Banana",
-                                                           if_else(grepl("fish",key),"Fish",
+                                                           if_else(grepl("fish",key),"Dry fish",
                                                                    if_else(grepl("chicken",key),"Chicken","error",NULL
                                                                    )))))))),
     color = if_else(grepl("price_of_1kg",key),"#d0cdbc",
@@ -134,7 +133,7 @@ final_group_gather <- final %>% group_by(key,round) %>% summarise(
 
 final_data_for_chart <- final_group_gather %>% dplyr::mutate(
     name = if_else(grepl("soap_bar",key),"Soap",
-                   if_else(grepl("bleachwashing",key),"Bleach/washing powder",
+                   if_else(grepl("bleachwashing",key),"Washing powder",
                            if_else(grepl("paracetamol",key),"Paracetamol", "error",NULL))),
 
     color = if_else(grepl("soap_bar",key),"#d0cdbc",

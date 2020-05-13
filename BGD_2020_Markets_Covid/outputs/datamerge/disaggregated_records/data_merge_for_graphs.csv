@@ -1,0 +1,2 @@
+line_graph.food_item,line_graph.non_food_item,box_chart.food_item,box_chart.non_food_item
+./graphs/line_food_item.jpg,./graphs/line_non_food_item.jpg,./graphs/food_item.jpg,./graphs/non_food_item.jpg

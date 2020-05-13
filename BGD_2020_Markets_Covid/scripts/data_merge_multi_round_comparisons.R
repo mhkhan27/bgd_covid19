@@ -1,4 +1,4 @@
-
+rm(list = ls())
 
 # Library -----------------------------------------------------------------
 
@@ -12,8 +12,6 @@ library(survey)
 library(readxl)
 library(matrixStats) # needed for row medians
 source("BGD_2020_Markets_Covid/scripts/functions/utils.R")
-
-
 
 
 
@@ -92,9 +90,6 @@ current_analysis<-butteR::mean_proportion_table(design = dfsvy,list_of_variables
 prev_analysis<-butteR::mean_proportion_table(design = dfsvy_prev,list_of_variables = cols_to_analyze)
 
 
-
-
-
 # get datamerge values for table 1 in FS ----------------------------------
 
 
@@ -141,8 +136,6 @@ rank_table<-prepare_rank_table(items_affected_binded)
 items_most_affected_ranked<-datamerge_from_rank_table(rank_table = rank_table,xlsform_lookup = xls_lt,rank_n = 6)
 items_most_affected_ranked_labeled<-items_most_affected_ranked$wide %>% select(contains("_lab_"))
 dm_output[["items_most_afftected_rankked"]]<-items_most_affected_ranked_labeled
-
-
 
 # median analysis - prev & current round comparison -----------------------
 
@@ -204,8 +197,9 @@ dm_output[["p1_table_price_differences"]]<-price_differences_dm
 # datamerge_output_file<-do.call("cbind",dm_output)
 datamerge_output_file<-bind_cols(dm_output)
 colnames(datamerge_output_file)
-datamerge_output_file %>% write.csv("BGD_2020_Markets_Covid/outputs/datamerge/datamerge_placeholders_12may2020.csv")
 
+datamerge_output_file %>% write.csv("BGD_2020_Markets_Covid/outputs/datamerge/disaggregated_records/datamerge_placeholders.csv")
+datamerge_output_file %>% write.csv( paste0("BGD_2020_Markets_Covid/outputs/datamerge/disaggregated_records/",str_replace_all(Sys.Date(),"-","_"), "_datamerge_placeholders.csv"))
 
 
 

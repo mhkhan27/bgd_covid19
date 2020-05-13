@@ -1,3 +1,5 @@
+#this script can run with Crlt + A, no changing required
+
 rm(list = ls())
 
 # library -----------------------------------------------------------------
@@ -8,7 +10,7 @@ library(tidyr)
 library(forcats)
 
 items<- c("food_item","non_food_item")[1]
-current_round <- "round 1"
+
 
 # function ----------------------------------------------------------------
 
@@ -26,17 +28,15 @@ fun_min <- function(x){
 outputfolder_box <-"BGD_2020_Markets_Covid/outputs/datamerge/graphs/"
 
 # read_data ---------------------------------------------------------------
+clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
 
-raw_df <- read.csv("inputs/02_cleaned_data/recoded_data/2020_05_10_reach_bgd_market_assessment_cleaned_r2.csv", stringsAsFactors = FALSE,
-                   na.strings = c("", " ", NA))
-# date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = FALSE,
-#                      na.strings = c("", " ", NA)) %>% select(-"reported_date")
-#
-# data_with_round<- raw_df %>%  left_join(date_log,"X_uuid") #add_round
 
-# cleaned_df <- data_with_round %>% filter(round == current_round)
+round_number<-length(clean_data_file_paths)
 
-cleaned_df <- raw_df
+current_round <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
+                          na.strings = c("", " ", NA))
+
+cleaned_df <- current_round
 
 # food item ---------------------------------------------------------------
 if (items == "food_item"){
@@ -50,12 +50,12 @@ if (items == "food_item"){
 
   data_for_box2 <- data_for_box2 %>% dplyr::mutate(
     name = if_else(grepl("price_of_1kg",data_for_box2$key),"Rice\n(1kg)",
-                   if_else(grepl("cooking_oil",data_for_box2$key),"Oil\n(1L)",
+                   if_else(grepl("cooking_oil",data_for_box2$key),"Cooking oil\n(1L)",
                            if_else(grepl("lentils",data_for_box2$key),"Lentils \n (1kg)",
-                                   if_else(grepl("leafy_greens",data_for_box2$key),"Leafy greens\n (.5kg)",
+                                   if_else(grepl("leafy_greens",data_for_box2$key),"Leafy greens\n (0.5kg)",
                                            if_else(grepl("eggs",data_for_box2$key),"Egg\n(12pcs)",
-                                                   if_else(grepl("bananas",data_for_box2$key),"Banana\n(1kg)",
-                                                           if_else(grepl("fish",data_for_box2$key),"Fish\n(1kg)",
+                                                   if_else(grepl("bananas",data_for_box2$key),"Banana\n(12 pcs)",
+                                                           if_else(grepl("fish",data_for_box2$key),"Dry fish\n(1kg)",
                                                                    if_else(grepl("chicken",data_for_box2$key),"Chicken\n(12 pcs)","error",NULL
                                                                    )))))))))
 
@@ -79,8 +79,8 @@ if (items == "food_item"){
           panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',
                                             colour = "#c1c1c1"))+ylab("Price (BDT)")+
     stat_summary(fun.data = fun_median, geom="text", size=3, hjust=-2)+
-    stat_summary(fun.data = fun_max, geom="text", size=3,vjust=-.4)+
-    stat_summary(fun.data = fun_min, geom="text", size=3, vjust=1.2 )
+    stat_summary(fun.data = fun_max, geom="text", size=3,vjust=-.6)+
+    stat_summary(fun.data = fun_min, geom="text", size=3, vjust=1.4 )
 
   dat <- ggplot_build(p)$data[[1]]
 
@@ -106,7 +106,7 @@ if(items == "non_food_item"){
 
   data_for_box_non_fd2 <- data_for_box_non_fd2 %>% dplyr::mutate(
     name = if_else(grepl("soap_bar",data_for_box_non_fd2$key),"Soap\n(100g)",
-                   if_else(grepl("bleachwashing",data_for_box_non_fd2$key),"Bleach/washing powder\n(5l)",
+                   if_else(grepl("bleachwashing",data_for_box_non_fd2$key),"Washing powder\n(0.5kg)",
                            if_else(grepl("paracetamol ",data_for_box_non_fd2$key),"Paracetamol\n(12 pcs)",
                                    if_else(grepl("tarpaulin ",data_for_box_non_fd2$key),"Tarpaulin\n(4mx5m)","error",NULL)))))
 
@@ -130,8 +130,8 @@ if(items == "non_food_item"){
           panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',
                                             colour = "#c1c1c1"))+ylab("Price (BDT)")+
     stat_summary(fun.data = fun_median, geom="text", size=3, hjust=-2)+
-    stat_summary(fun.data = fun_max, geom="text", size=3,vjust=-.4)+
-    stat_summary(fun.data = fun_min, geom="text", size=3, vjust=1.2 )
+    stat_summary(fun.data = fun_max, geom="text", size=3,vjust=-.6)+
+    stat_summary(fun.data = fun_min, geom="text", size=3, vjust=1.4 )
 
   dat2 <- ggplot_build(q)$data[[1]]
 

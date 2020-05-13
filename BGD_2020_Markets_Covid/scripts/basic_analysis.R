@@ -1,3 +1,5 @@
+#recoding.R should be run first. NO other change is required
+
 rm(list=ls())
 
 # Library -----------------------------------------------------------------
@@ -16,13 +18,10 @@ create_csv <- c("yes","no")[1]
 
 # data_read ---------------------------------------------------------------
 
-cleaned_df <- read.csv("inputs/02_cleaned_data/recoded_data/2020_05_10_reach_bgd_market_assessment_cleaned_r2.csv", stringsAsFactors = FALSE,
+cleaned_df <- read.csv("BGD_2020_Markets_Covid\\inputs\\recoded_data/reach_bgd_market_assessment_cleaned.csv", stringsAsFactors = FALSE,
                  na.strings = c("", " ", NA))
 # indv <- read.csv("inputs/01_daily_data/indv.csv", stringsAsFactors = FALSE,
                  # na.strings = c("", " ", NA))
-
-analysis_indicator <-  read.csv("inputs/dap/Analysis_indicators.csv", stringsAsFactors = FALSE,
-                                na.strings = c("", " ", NA))
 
 data_for_analysis <- cleaned_df
 
@@ -36,7 +35,11 @@ col_not_to_analyze <- c("days_of_stock_of_rice", "restocking_time_of_rice", "day
                         "days_of_stock_of_dry_fish", "restocking_time_of_dry_fish", "days_of_stock_of_soap",
                         "restocking_time_of_soap", "days_of_stock_of_washing_powder",
                         "restocking_time_of_washing_powder","ki_code","informed_consent"
-                        ,"X","X_uuid","survey_date", "survey_start","end_survey","instance_name")
+                        ,"X","X_uuid","survey_date", "survey_start","end_survey","instance_name",
+                        "X_id","upazilla",
+                        "X_submission_time",
+                        "X_index","camp",
+                        "fgf")
 
 col_to_analyze <- data_for_analysis %>% select(-col_not_to_analyze) %>% dplyr::select(-contains("_other"))   %>% colnames()
 
@@ -57,7 +60,7 @@ dfsvy$variables$upazilla<- forcats::fct_expand(dfsvy$variables$upazilla,c( "ukhi
 dfsvy$variables$sell_tarpaulin<- forcats::fct_expand(dfsvy$variables$sell_tarpaulin,c( "no", "yes"))
 dfsvy$variables$sell_paracetamol<- forcats::fct_expand(dfsvy$variables$sell_paracetamol,c( "no", "yes"))
 
-cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit",
+cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit","dry_fish_unit",
                   "lentils_unit","leafy_greens_unit","bananas_unit",
                   "soap_unit","washing_powder_unit","chicken_unit")
 
@@ -138,7 +141,7 @@ for(i in median_col){
 # write csv ---------------------------------------------------------------
 
 if (create_csv =="yes"){
-  output_location <- "outputs/02_butter_analysis/"
+  output_location <- "BGD_2020_Markets_Covid/outputs/butter_analysis/"
   write.csv(basic_analysis_overall,paste0(output_location,str_replace_all(Sys.Date(),"-","_"),"_basic_analysis_overall.csv"))
   write.csv(basic_analysis_overall,paste0(output_location,"basic_analysis_overall.csv"))
   }

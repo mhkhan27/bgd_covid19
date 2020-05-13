@@ -1,4 +1,8 @@
+#round should change in each round for naming purpose.
+# no change in read_data
+
 rm(list=ls())
+
 # Library -----------------------------------------------------------------
 
 library(dplyr)
@@ -15,8 +19,16 @@ round <- "r2"
 
 # data_read ---------------------------------------------------------------
 
-main_df <- read.csv("inputs/02_cleaned_data/cleaned_data.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
+clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
+
+
+round_number<-length(clean_data_file_paths)
+
+
+current_round <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
+                          na.strings = c("", " ", NA))
+
+main_df <- current_round
 
 
 # recoding ----------------------------------------------------------------
@@ -53,5 +65,6 @@ for(i in colnams){
 
 # write_csv ---------------------------------------------------------------
 
-write.csv(main_df,paste0("inputs/02_cleaned_data/recoded_data/",str_replace_all(Sys.Date(),"-","_"),"_reach_bgd_market_assessment_cleaned_",round,".csv"))
+write.csv(main_df,paste0("BGD_2020_Markets_Covid\\inputs\\recoded_data/",str_replace_all(Sys.Date(),"-","_"),"_reach_bgd_market_assessment_cleaned_",round,".csv"))
+write.csv(main_df,paste0("BGD_2020_Markets_Covid\\inputs\\recoded_data/reach_bgd_market_assessment_cleaned.csv"))
 

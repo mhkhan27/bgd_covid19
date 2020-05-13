@@ -1,3 +1,5 @@
+#this script is archive. we are not using it anymore. Just keeping for future reference
+
 rm(list = ls())
 
 library(dplyr)
@@ -28,11 +30,11 @@ sort_for_dfcults_fcd_in_repl <- sort(data_for_dfcults_fcd_in_repl[1,], decreasin
 
 
 if( ncol(sort_for_dfcults_fcd_in_repl) > 5 ){
-  top5_dfcults_fcd_in_repl<- sort_for_dfcults_fcd_in_repl[1:5] %>% colnames()
+  top5_dfcults_fcd_in_repl<- sort_for_dfcults_fcd_in_repl[1:5]
 }
 
 if( ncol(sort_for_dfcults_fcd_in_repl) < 6 ){
-  top5_dfcults_fcd_in_repl<- sort_for_dfcults_fcd_in_repl %>% colnames()
+  top5_dfcults_fcd_in_repl<- sort_for_dfcults_fcd_in_repl
 }
 
 
@@ -48,12 +50,18 @@ data_for_assistance_items_if_yes<- data_for_assistance_items_if_yes[,-(which(col
 sort_assistance_items_if_yes <- sort(data_for_assistance_items_if_yes[1,], decreasing = TRUE)
 
 if( ncol(sort_assistance_items_if_yes) > 5 ){
-  top5_assistance_items_if_yes<- sort_assistance_items_if_yes[1:5] %>% colnames()
+  top5_assistance_items_if_yes<- sort_assistance_items_if_yes[1:5]
 }
 
 if( ncol(sort_assistance_items_if_yes) < 6 ){
-  top5_assistance_items_if_yes<- sort_assistance_items_if_yes %>% colnames()
+  top5_assistance_items_if_yes<- sort_assistance_items_if_yes
 }
+
+
+top5_data_merge <- cbind(top5_dfcults_fcd_in_repl,top5_assistance_items_if_yes)
+
+
+
 
 
 # change is number of vendor ----------------------------------------------
