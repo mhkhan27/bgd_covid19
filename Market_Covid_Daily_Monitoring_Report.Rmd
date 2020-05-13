@@ -36,11 +36,20 @@ library(AMR)
 source("BGD_2020_Markets_Covid/scripts/functions/GIS_Project_Functions.R")
 
 
-
 #load data
 
-main <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_12_reach_bgd_markets_assessment_cleaned_r2.csv", stringsAsFactors = FALSE, 
-                   na.strings = c("", " ", NA))
+clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
+
+
+round_number<-length(clean_data_file_paths)
+
+
+main <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
+                          na.strings = c("", " ", NA))
+
+
+# main <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_12_reach_bgd_markets_assessment_cleaned_r2.csv", stringsAsFactors = FALSE, 
+                   # na.strings = c("", " ", NA))
 # indv <- read.csv("inputs/01_daily_data/indv.csv", stringsAsFactors = FALSE, 
                    # na.strings = c("", " ", NA))
 
