@@ -35,7 +35,11 @@ library(butteR)
 library(AMR)
 source("BGD_2020_Markets_Covid/scripts/functions/GIS_Project_Functions.R")
 
+round_text<- "round 2"
 
+write_csv_output <-"yes"
+
+day_to_run <- Sys.Date()
 #load data
 
 clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()

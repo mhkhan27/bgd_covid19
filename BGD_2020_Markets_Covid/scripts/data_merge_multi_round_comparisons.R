@@ -23,7 +23,7 @@ name_changes<-tibble::tibble(round_1=c("sell_fish",
                                        "days_of_stock_of_fish" ,
                                        "cheapest_price_for_12_of_chicken"),
                round_2= c("sell_dry_fish",
-                          "cheapest_price_for_1kg__of_dry_fish",
+                          "dry_fish_sale_in_past_week",
                           "days_of_stock_of_dry_fish",
                           "cheapest_price_for_4mx5m_of_chicken"))
 

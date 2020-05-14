@@ -91,7 +91,7 @@ percent_diff_dm<-function(x,y){
   x_abs<-x2%>%
     abs() %>%
     rename_all(.funs = ~paste0(.,".perc"))
-  results[["current_round"]]<-round(x*100,0)
+  results[["current_round"]]<-x
   results[["percent_diff"]]<-x_abs
   results[["triangle"]]<-triangles
   return(results)

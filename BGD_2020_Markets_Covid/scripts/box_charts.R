@@ -9,7 +9,7 @@ library(ggplot2)
 library(tidyr)
 library(forcats)
 
-items<- c("food_item","non_food_item")[1]
+items<- c("food_item","non_food_item")[2]
 
 
 # function ----------------------------------------------------------------

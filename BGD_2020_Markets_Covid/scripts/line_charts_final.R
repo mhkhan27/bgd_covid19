@@ -11,7 +11,7 @@ library(tidyr)
 library(stringr)
 library(Hmisc)
 
-items<- c("food_item","non_food_item")[1]
+items<- c("food_item","non_food_item")[2]
 
 # path --------------------------------------------------------------------
 

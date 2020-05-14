@@ -38,8 +38,8 @@ col_not_to_analyze <- c("days_of_stock_of_rice", "restocking_time_of_rice", "day
                         ,"X","X_uuid","survey_date", "survey_start","end_survey","instance_name",
                         "X_id","upazilla",
                         "X_submission_time",
-                        "X_index","camp",
-                        "fgf")
+                        "X_index","camp"
+                        )
 
 col_to_analyze <- data_for_analysis %>% select(-col_not_to_analyze) %>% dplyr::select(-contains("_other"))   %>% colnames()
 
