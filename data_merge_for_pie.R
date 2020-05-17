@@ -1,6 +1,6 @@
 
-#data_merge_multiround_comparisons.R & basic_analysis.R should be run first
-#this script can run with Crlt + A, no changing required
+#data_merge_multiround_comparisons.R & basic_analysis.R should run first
+#this script can run with Crlt + A, No change is required
 
 rm(list = ls())
 
@@ -43,9 +43,10 @@ basic_analysis_top5[is.na(basic_analysis_top5)] <- 0 #covert NA to 0
 ## difficulties_faced_in_replenishing-top 5 --------------------------------
 
  data_for_dfcults_fcd_in_repl <- basic_analysis_top5 %>% dplyr::select(starts_with("difficulties_faced_in_replenishing."))
+# data_for_dfcults_fcd_in_repl <-
 
  #remove cols, which value is 0
- data_for_dfcults_fcd_in_repl<- data_for_dfcults_fcd_in_repl[,-(which(colSums(data_for_dfcults_fcd_in_repl)==0))]
+ data_for_dfcults_fcd_in_repl<- data_for_dfcults_fcd_in_repl %>% select_if(~sum(.) != 0)
 
  sort_for_dfcults_fcd_in_repl <- sort(data_for_dfcults_fcd_in_repl[1,], decreasing = TRUE)
 
@@ -64,7 +65,7 @@ basic_analysis_top5[is.na(basic_analysis_top5)] <- 0 #covert NA to 0
  data_for_assistance_items_if_yes <- basic_analysis_top5 %>% dplyr::select(starts_with("assistance_items_if_yes."))
 
  #remove cols, which value is 0
- data_for_assistance_items_if_yes<- data_for_assistance_items_if_yes[,-(which(colSums(data_for_assistance_items_if_yes)==0))]
+ data_for_assistance_items_if_yes<- data_for_assistance_items_if_yes %>%  select_if(~sum(.) != 0)
 
 
  sort_assistance_items_if_yes <- sort(data_for_assistance_items_if_yes[1,], decreasing = TRUE)
@@ -113,7 +114,8 @@ write.csv(dm_pie_2,paste0("BGD_2020_Markets_Covid/outputs/datamerge/disaggregate
 # stock_data --------------------------------------------------------------
 
 stoke_restoke_cols <- basic_analysis %>% select(c(starts_with("i.days_of_stock_of_"),
-                                                  starts_with("i.restocking_time_of_"))) %>%
+                                                  starts_with("i.restocking_time_of_"),
+                                                  "assistance_items.yes")) %>%
         select(-ends_with("median"))
 
 stoke_restoke <- stoke_restoke_cols %>%  mutate_all(.,function(x){x<-x*100})
@@ -128,9 +130,60 @@ data_merge_multiround_comparisons <- read.csv("BGD_2020_Markets_Covid/outputs/da
 data_merge_graphs <- read.csv("BGD_2020_Markets_Covid/outputs/datamerge/disaggregated_records/data_merge_for_graphs.csv",
                               stringsAsFactors = FALSE,na.strings = c("", " ", NA))
 
+
+
+# overall_perctage_change -------------------------------------------------
+
+xlsform_paths<-list.files("BGD_2020_Markets_Covid/inputs/kobo_tool/",full.names = T) %>% sort()
+clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
+round_number<-length(clean_data_file_paths)
+
+current_round_opc <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
+                              na.strings = c("", " ", NA))
+prev_round_opc <- read.csv(clean_data_file_paths[round_number-1], stringsAsFactors = FALSE,
+                           na.strings = c("", " ", NA))
+
+old_cols_names_opc <-c("cheapest_price_for_1kg__of_fish","cheapest_price_for_12_of_chicken")
+new_cols_names_opc <-c("dry_fish_sale_in_past_week","cheapest_price_for_4mx5m_of_chicken")
+
+prev_round_opc <-prev_round_opc %>%  rename_at(vars(old_cols_names_opc),funs(str_replace(.,old_cols_names_opc,new_cols_names_opc)))
+
+cols_for_line_graph_opc <- c("X_uuid","price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
+                             "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
+                             "cheapest_price_for_12__of_eggs", "dry_fish_sale_in_past_week",
+                             "cheapest_price_for_4mx5m_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
+                             "cheapest_price_for_0_5l_of_bleachwashing_powder")
+#"cheapest_price_for_12_of_paracetamol",,"cheapest_price_for_4mx5m_of_tarpaulin",
+
+prev_round_clean_opc <-prev_round_opc[cols_for_line_graph_opc]
+current_round_clean_opc <- current_round_opc[cols_for_line_graph_opc]
+
+cleaned_df_opc <- rbind(prev_round_clean_opc,current_round_clean_opc)
+
+date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = FALSE,
+                     na.strings = c("", " ", NA)) %>% select(-"reported_date")
+
+data_with_round_opc<- cleaned_df_opc %>%  left_join(date_log,"X_uuid") #add_round
+
+data_with_round_opc$round <- capitalize(data_with_round_opc$round)
+
+data_with_round_opc <- data_with_round_opc %>% select(-"X_uuid")
+
+final <- gather(data_with_round_opc,c(1:(ncol(data_with_round_opc)-1)),key = "key",value = "value")
+
+final_summary <- final %>% group_by(round,key) %>% summarise(
+        media_value = median(value,na.rm = T))
+
+final_summary2 <-final_summary %>% spread("round","media_value")
+
+difference <- sum(final_summary2$`Round 2` )-sum(final_summary2$`Round 1` )
+
+over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`Round 1` )*100)
+
+
 # combind -----------------------------------------------------------------
 
-final_data_merge_to_be_shared <- cbind(data_merge_multiround_comparisons,dm_pie_2,data_merge_graphs,stoke_restoke)
+final_data_merge_to_be_shared <- cbind(data_merge_multiround_comparisons,dm_pie_2,data_merge_graphs,stoke_restoke,over_all_price_change)
 
 write.csv(final_data_merge_to_be_shared,paste0("BGD_2020_Markets_Covid/outputs/datamerge/",str_replace_all(Sys.Date(),"-","_"),"_final_data_merge.csv"))
 

@@ -1,5 +1,4 @@
 #new round data should be added first before run it.
-#this script might be change in future
 
 rm(list = ls())
 
@@ -61,7 +60,7 @@ data_with_round$round <- capitalize(data_with_round$round)
                    "days_of_stock_of_lentils","days_of_stock_of_chicken",
                    "days_of_stock_of_leafy_greens", "days_of_stock_of_bananas",
                    "days_of_stock_of_eggs", "days_of_stock_of_dry_fish",
-                   "days_of_stock_of_soap","days_of_stock_of_washing_powder",
+                   "days_of_stock_of_washing_powder","days_of_stock_of_soap",
                    "round")
 #"days_of_stock_of_tarpaulin","days_of_stock_of_paracetamol",
 
@@ -82,8 +81,8 @@ final_group_gather <- final %>% group_by(key,round) %>% summarise(
                                                    if_else(grepl("bananas",key),"Banana",
                                                            if_else(grepl("fish",key),"Dry fish",
                                                                    if_else(grepl("chicken",key),"Chicken",
-                                                                           if_else(grepl("soap",key),"Soap",
-                                                                                   if_else(grepl("powder",key),"Washing powder",
+                                                                              if_else(grepl("powder",key),"Washing \n powder",
+                                                                                      if_else(grepl("soap",key),"Soap",
                                                                                            if_else(grepl("paracetamol",key),"Paracetamol",
                                                                                                    if_else(grepl("tarpaulin",key),"Tarpaulin","error",NULL
                                                                    )))))))))))),
@@ -118,8 +117,8 @@ final_group_gather <- final %>% group_by(key,round) %>% summarise(
           legend.position = "bottom",
           legend.justification = 0,
           legend.key.width =  unit(1,"cm"),
-          legend.spacing.x = unit(1, "cm"),
-          legend.spacing.y = unit(.5, "cm"),
+          legend.spacing.x = unit(.9, "cm"),
+          legend.spacing.y = unit(.7, "cm"),
           legend.key.size = unit(1, 'lines'),
           legend.key = element_rect(fill = NA),
           legend.text.align = 0)+ ylab("Days")+

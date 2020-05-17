@@ -1,4 +1,4 @@
-#this script can run with Crlt + A, no changing required
+#this script can run with Crlt + A,  No change is required
 
 rm(list = ls())
 

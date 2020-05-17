@@ -1,4 +1,4 @@
-#recoding.R should be run first. NO other change is required
+#recoding.R should run first.  No change is required
 
 rm(list=ls())
 

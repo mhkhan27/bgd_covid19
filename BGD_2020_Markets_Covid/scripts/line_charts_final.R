@@ -1,5 +1,4 @@
-#new round data should be added first before run it.
-#this script might be change in future
+#new round data should be added first before running it.
 
 rm(list = ls())
 
