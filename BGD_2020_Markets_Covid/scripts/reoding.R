@@ -1,4 +1,4 @@
-#round should change in each round for naming purpose.
+#round should be changed in each round for naming purpose.
 # no change in read_data
 
 rm(list=ls())
@@ -39,7 +39,8 @@ colnams <- c("days_of_stock_of_chicken","restocking_time_of_chicken",
              "days_of_stock_of_leafy_greens","restocking_time_of_leafy_greens","days_of_stock_of_bananas",
              "restocking_time_of_bananas","days_of_stock_of_eggs","restocking_time_of_eggs",
              "days_of_stock_of_dry_fish", "restocking_time_of_dry_fish", "days_of_stock_of_soap",
-             "restocking_time_of_soap", "days_of_stock_of_washing_powder", "restocking_time_of_washing_powder")
+             "restocking_time_of_soap", "days_of_stock_of_washing_powder", "restocking_time_of_washing_powder"
+             )
 
 
 for(i in colnams){

@@ -79,7 +79,7 @@ main <- main %>% dplyr::mutate(
 )
 
 # main$reported_date <- ymd(substr(main$survey_start,1,10))
-date_log_full<- main %>% select(c("X_index","X_uuid","reported_date","round"))
+date_log_full<- main %>% select(c("X_uuid","reported_date","round"))
   
   
 if(write_csv_output=="yes"){

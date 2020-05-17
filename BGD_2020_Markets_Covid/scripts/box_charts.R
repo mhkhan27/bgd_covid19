@@ -9,17 +9,17 @@ library(ggplot2)
 library(tidyr)
 library(forcats)
 
-items<- c("food_item","non_food_item")[2]
+items<- c("food_item","non_food_item")[1]
 
 
 # function ----------------------------------------------------------------
 
 fun_median <- function(x){
-  return(data.frame(y=median(x),label=median(x,na.rm=T)))}
+  return(data.frame(y=median(x,na.rm = T),label= round(median(x,na.rm=T),0)))}
 fun_max <- function(x){
-  return(data.frame(y=max(x),label=max(x,na.rm=T)))}
+  return(data.frame(y=max(x,na.rm = T),label=max(x,na.rm=T)))}
 fun_min <- function(x){
-  return(data.frame(y=min(x),label=min(x,na.rm=T)))}
+  return(data.frame(y=min(x,na.rm = T),label=min(x,na.rm=T)))}
 
 
 
@@ -78,16 +78,16 @@ if (items == "food_item"){
                                           size = 2, linetype = "solid"),
           panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',
                                             colour = "#c1c1c1"))+ylab("Price (BDT)")+
-    stat_summary(fun.data = fun_median, geom="text", size=3, hjust=-2)+
-    stat_summary(fun.data = fun_max, geom="text", size=3,vjust=-.6)+
-    stat_summary(fun.data = fun_min, geom="text", size=3, vjust=1.4 )
+    stat_summary(fun.data = fun_median, geom="text", size=4, hjust=-1.3)+
+    stat_summary(fun.data = fun_max, geom="text", size=4,vjust=-.6)+
+    stat_summary(fun.data = fun_min, geom="text", size=4, vjust=1.4 )
 
   dat <- ggplot_build(p)$data[[1]]
 
   p + geom_segment(data=dat, aes(x=xmin, xend=xmax,
                                  y=middle, yend=middle), colour="#cf5858", size=1)+
     geom_text(data = sample,
-              aes(name,Inf,label = ss),size=3, vjust = 1.8)+
+              aes(name,Inf,label = ss),size=4, vjust = 1.8)+
     ylim(0,ymax)
 
 
@@ -98,8 +98,8 @@ if (items == "food_item"){
 
 if(items == "non_food_item"){
 
-  box_non_fd_item_cols <- c("cheapest_price_for_100g_soap_bar_of_soap", "cheapest_price_for_0_5l_of_bleachwashing_powder",
-                            "cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin")
+  box_non_fd_item_cols <- c("cheapest_price_for_100g_soap_bar_of_soap", "cheapest_price_for_0_5l_of_bleachwashing_powder")
+                            #"cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin"
   data_for_box_non_fd <- cleaned_df[box_non_fd_item_cols]
   data_for_box_non_fd2<- data_for_box_non_fd %>% gather() %>% dplyr::filter(!is.na(value))
 
@@ -129,16 +129,16 @@ if(items == "non_food_item"){
                                           size = 2, linetype = "solid"),
           panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',
                                             colour = "#c1c1c1"))+ylab("Price (BDT)")+
-    stat_summary(fun.data = fun_median, geom="text", size=3, hjust=-2)+
-    stat_summary(fun.data = fun_max, geom="text", size=3,vjust=-.6)+
-    stat_summary(fun.data = fun_min, geom="text", size=3, vjust=1.4 )
+    stat_summary(fun.data = fun_median, geom="text", size=4, hjust=-1.3)+
+    stat_summary(fun.data = fun_max, geom="text", size=4,vjust=-.6)+
+    stat_summary(fun.data = fun_min, geom="text", size=4, vjust=1.4 )
 
   dat2 <- ggplot_build(q)$data[[1]]
 
   q + geom_segment(data=dat2, aes(x=xmin, xend=xmax,
                                   y=middle, yend=middle), colour="#cf5858", size=1)+
     geom_text(data = sample2,
-              aes(name,Inf,label = ss),size=3, vjust = 1.8)+
+              aes(name,Inf,label = ss),size=4, vjust = 1.8)+
     ylim(0,ymax)
 
   ggsave(path = outputfolder_box,filename ="non_food_item.jpg" ,width=7.9706,height=7.62,units="cm",scale = 1.8)

@@ -28,9 +28,6 @@ name_changes<-tibble::tibble(round_1=c("sell_fish",
                           "cheapest_price_for_4mx5m_of_chicken"))
 
 
-
-
-
 # automatically load current and previous round data
 
 xlsform_paths<-list.files("BGD_2020_Markets_Covid/inputs/kobo_tool/",full.names = T) %>% sort()
@@ -109,16 +106,19 @@ dm_output[["top_assistance_items"]]<-top_n_assistance_items$wide
 selling_affected_table<-tibble(
 
   selling_item=c("sell_bananas", "sell_chicken", "sell_eggs", "sell_dry_fish",
-                 "sell_leafy_greens", "sell_lentils","cooking_oil", "sell_paracetamol", "sell_washing_powder",
-                 "selling_rice",  "sell_soap",
-                 "sell_tarpaulin" ),
+                 "sell_leafy_greens", "cooking_oil",
+                 "selling_rice",  "sell_soap"
+                  ),
+  #"sell_tarpaulin",  "sell_paracetamol", "sell_washing_powder","sell_lentils",
 
   affected_item= c("items_are_most_affected.bananas", "items_are_most_affected.Chicken",
                    "items_are_most_affected.eggs", "items_are_most_affected.fish",
-                   "items_are_most_affected.leafy_greens", "items_are_most_affected.lentils",
-                   "items_are_most_affected.oil", "items_are_most_affected.paracetamol",
-                   "items_are_most_affected.powder", "items_are_most_affected.rice",
-                   "items_are_most_affected.soap", "items_are_most_affected.tarpaulin")
+                   "items_are_most_affected.leafy_greens",
+                   "items_are_most_affected.oil",
+                   "items_are_most_affected.rice",
+                   "items_are_most_affected.soap" )
+
+  #"items_are_most_affected.tarpaulin", "items_are_most_affected.paracetamol",  "items_are_most_affected.powder", "items_are_most_affected.lentils",
 )
 
 
@@ -141,16 +141,17 @@ dm_output[["items_most_afftected_rankked"]]<-items_most_affected_ranked_labeled
 
 food_prices<-c("cheapest_price_for_12_of_chicken",
                 "cheapest_price_for_cooking_oil",
-                "cheapest_price_for_1kg_of_lentils",
+               "cheapest_price_for_1kg_of_lentils",
                 "cheapest_price_for_0.5kg_of_leafy_greens",
                 "cheapest_price_for_1kg_of_bananas",
                 "cheapest_price_for_12__of_eggs",
                 "cheapest_price_for_1kg__of_fish",
                "price_of_1kg")
+#
 nfi_prices<-c("cheapest_price_for_100g_soap_bar_of_soap",
-                "cheapest_price_for_0_5l_of_bleachwashing_powder",
-                "cheapest_price_for_12_of_paracetamol",
-                "cheapest_price_for_4mx5m_of_tarpaulin")
+                "cheapest_price_for_0_5l_of_bleachwashing_powder"
+             )
+#   "cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin"
 
 
 

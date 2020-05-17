@@ -87,28 +87,37 @@ basic_analysis_top5[is.na(basic_analysis_top5)] <- 0 #covert NA to 0
 data_merge_pie <- data_merge %>%  mutate_all(.,function(x){x<-x*100})
 data_merge_pie <- data_merge_pie %>%  mutate_all(.,function(x){x<-round(x,0)})
 
-remove_cols <- c("fresh_food_items.From.wholesaler...market.outside.of.camp",
-                 "fresh_food_items.From.wholesaler...market.within.camp", "fresh_food_items.from_wholesaler",
-                 "fresh_food_items.market_outside_of_camp", "non_fresh_food_items.From.wholesaler...market.outside.of.camp",
-                 "non_fresh_food_items.From.wholesaler...market.within.camp",
+remove_cols <- c("fresh_food_items.from.wholesaler...market.outside.of.camp",
+                 "fresh_food_items.from.wholesaler...market.within.camp", "fresh_food_items.from_wholesaler",
+                 "fresh_food_items.market_outside_of_camp", "non_fresh_food_items.from.wholesaler...market.outside.of.camp",
+                 "non_fresh_food_items.from.wholesaler...market.within.camp",
                  "non_fresh_food_items.from_wholesaler", "non_fresh_food_items.market_outside_of_camp",
-                 "hygenic_nfi.From.wholesaler...market.outside.of.camp", "hygenic_nfi.From.wholesaler...market.within.camp",
+                 "hygenic_nfi.from.wholesaler...market.outside.of.camp", "hygenic_nfi.from.wholesaler...market.within.camp",
                  "hygenic_nfi.from_wholesaler", "hygenic_nfi.market_outside_of_camp")
 
 dm_pie_2 <- data_merge_pie %>% mutate(
-        fresh_food_items.inside_the_camp = fresh_food_items.from_wholesaler + fresh_food_items.From.wholesaler...market.within.camp,
-        fresh_food_items.outside_the_camp = fresh_food_items.market_outside_of_camp + fresh_food_items.From.wholesaler...market.outside.of.camp,
+        fresh_food_items.inside_the_camp = fresh_food_items.from_wholesaler + fresh_food_items.from.wholesaler...market.within.camp,
+        fresh_food_items.outside_the_camp = fresh_food_items.market_outside_of_camp + fresh_food_items.from.wholesaler...market.outside.of.camp,
 
-        non_fresh_food_items.inside_the_camp = non_fresh_food_items.from_wholesaler + non_fresh_food_items.From.wholesaler...market.within.camp,
-        non_fresh_food_items.outside_the_camp = non_fresh_food_items.market_outside_of_camp + non_fresh_food_items.From.wholesaler...market.outside.of.camp,
+        non_fresh_food_items.inside_the_camp = non_fresh_food_items.from_wholesaler + non_fresh_food_items.from.wholesaler...market.within.camp,
+        non_fresh_food_items.outside_the_camp = non_fresh_food_items.market_outside_of_camp + non_fresh_food_items.from.wholesaler...market.outside.of.camp,
 
-        hygenic_nfi.inside_the_camp = hygenic_nfi.from_wholesaler + hygenic_nfi.From.wholesaler...market.within.camp,
-        hygenic_nfi.outside_the_camp = hygenic_nfi.market_outside_of_camp + hygenic_nfi.From.wholesaler...market.outside.of.camp
+        hygenic_nfi.inside_the_camp = hygenic_nfi.from_wholesaler + hygenic_nfi.from.wholesaler...market.within.camp,
+        hygenic_nfi.outside_the_camp = hygenic_nfi.market_outside_of_camp + hygenic_nfi.from.wholesaler...market.outside.of.camp
 ) %>% select(-remove_cols)
 
 write.csv(dm_pie_2,paste0("BGD_2020_Markets_Covid/outputs/datamerge/disaggregated_records/","pie_top5_data_merge.csv"))
 write.csv(dm_pie_2,paste0("BGD_2020_Markets_Covid/outputs/datamerge/disaggregated_records/",str_replace_all(Sys.Date(),"-","_"),"_pie_top5_data_merge.csv"))
 
+
+# stock_data --------------------------------------------------------------
+
+stoke_restoke_cols <- basic_analysis %>% select(c(starts_with("i.days_of_stock_of_"),
+                                                  starts_with("i.restocking_time_of_"))) %>%
+        select(-ends_with("median"))
+
+stoke_restoke <- stoke_restoke_cols %>%  mutate_all(.,function(x){x<-x*100})
+stoke_restoke <- stoke_restoke %>%  mutate_all(.,function(x){x<-round(x,0)})
 
 # read_data_for_multiround_comparisons and graphs -------------------------------------
 
@@ -121,7 +130,7 @@ data_merge_graphs <- read.csv("BGD_2020_Markets_Covid/outputs/datamerge/disaggre
 
 # combind -----------------------------------------------------------------
 
-final_data_merge_to_be_shared <- cbind(data_merge_multiround_comparisons,dm_pie_2,data_merge_graphs)
+final_data_merge_to_be_shared <- cbind(data_merge_multiround_comparisons,dm_pie_2,data_merge_graphs,stoke_restoke)
 
 write.csv(final_data_merge_to_be_shared,paste0("BGD_2020_Markets_Covid/outputs/datamerge/",str_replace_all(Sys.Date(),"-","_"),"_final_data_merge.csv"))
 

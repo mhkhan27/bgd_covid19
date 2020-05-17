@@ -11,7 +11,7 @@ library(tidyr)
 library(stringr)
 library(Hmisc)
 
-items<- c("food_item","non_food_item")[2]
+items<- c("food_item","non_food_item")[1]
 
 # path --------------------------------------------------------------------
 
@@ -36,8 +36,9 @@ cols_for_line_graph <- c("X_uuid","price_of_1kg","cheapest_price_for_cooking_oil
                          "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
                          "cheapest_price_for_12__of_eggs", "dry_fish_sale_in_past_week",
                          "cheapest_price_for_4mx5m_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
-                         "cheapest_price_for_0_5l_of_bleachwashing_powder",
-                         "cheapest_price_for_12_of_paracetamol")
+                         "cheapest_price_for_0_5l_of_bleachwashing_powder"
+                         )
+#"cheapest_price_for_12_of_paracetamol",,"cheapest_price_for_4mx5m_of_tarpaulin",
 
 round_1_clean <-round_1[cols_for_line_graph]
 round_2_clean <- round_2[cols_for_line_graph]
@@ -103,7 +104,7 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
           panel.grid.major.y = element_line(size = 0.5, linetype = "dashed",
                                             colour = "#c1c1c1"),
           legend.title=element_blank(),
-          legend.text = element_text(size = 8,color="#58585A"),
+          legend.text = element_text(size = 10,color="#58585A"),
           legend.position = "bottom",
           legend.justification = 0,
           legend.key.width =  unit(1,"cm"),
@@ -121,7 +122,8 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
 if (items  =="non_food_item"){
 
 cols_needed <- c("cheapest_price_for_100g_soap_bar_of_soap", "cheapest_price_for_0_5l_of_bleachwashing_powder",
-                   "cheapest_price_for_12_of_paracetamol","round")
+                  "round")
+#"cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin",
 
 data_with_cols <- data_with_round[cols_needed]
 
@@ -134,11 +136,13 @@ final_group_gather <- final %>% group_by(key,round) %>% summarise(
 final_data_for_chart <- final_group_gather %>% dplyr::mutate(
     name = if_else(grepl("soap_bar",key),"Soap",
                    if_else(grepl("bleachwashing",key),"Washing powder",
-                           if_else(grepl("paracetamol",key),"Paracetamol", "error",NULL))),
+                           if_else(grepl("paracetamol",key),"Paracetamol",
+                                   if_else(grepl("tarpaulin",key),"Tarpaulin","error",NULL)))),
 
     color = if_else(grepl("soap_bar",key),"#d0cdbc",
                     if_else(grepl("bleachwashing",key),"#a1c5a0",
-                            if_else(grepl("paracetamol",key),"#eeadad", "error",NULL))))
+                            if_else(grepl("paracetamol",key),"#eeadad",
+                                    if_else(grepl("tarpaulin",key),"#d3e5d4","error",NULL)))))
 
   final_data_for_chart$color <-factor(final_data_for_chart$color,unique(final_data_for_chart$color))
   final_data_for_chart$name <-factor(final_data_for_chart$name,unique(final_data_for_chart$name))
@@ -153,7 +157,7 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
           panel.grid.major.y = element_line(size = 0.5, linetype = "dashed",
                                             colour = "#c1c1c1"),
           legend.title=element_blank(),
-          legend.text = element_text(size = 8,color="#58585A"),
+          legend.text = element_text(size = 10,color="#58585A"),
           legend.position = "bottom",
           legend.justification = 0,
           legend.key.width =  unit(1,"cm"),

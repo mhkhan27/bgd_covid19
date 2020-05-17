@@ -38,7 +38,8 @@ make_xlsform_lookup_table<- function(kobo_survey, kobo_choices, label_column){
 refactor_to_xlsform<-function(data,kobo_survey,kobo_choices ,label_column = "label::english" ){
   xls_lt<-make_xlsform_lookup_table(kobo_survey ,kobo_choices,label_column )
   xls_lt_select_questions<-xls_lt %>%
-    filter(str_detect(question_type,"select"))
+    filter(str_detect(question_type,"select")) %>%
+    filter(question_name %in% colnames(data))
   for(i in 1: length(unique(xls_lt_select_questions$question_name))){
     col_temp <- unique(xls_lt_select_questions$question_name)[i]
     print(col_temp)
@@ -49,7 +50,6 @@ refactor_to_xlsform<-function(data,kobo_survey,kobo_choices ,label_column = "lab
   return(data)
 
 }
-
 
 add_rowwise_nfi_food_medians<-function(df){
   df<-df %>%
