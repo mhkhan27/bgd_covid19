@@ -9,7 +9,7 @@ library(ggplot2)
 library(tidyr)
 library(forcats)
 
-items<- c("food_item","non_food_item")[1]
+items<- c("food_item","non_food_item")[2]
 
 
 # function ----------------------------------------------------------------
@@ -53,10 +53,10 @@ if (items == "food_item"){
                    if_else(grepl("cooking_oil",data_for_box2$key),"Cooking oil\n(1L)",
                            if_else(grepl("lentils",data_for_box2$key),"Lentils \n (1kg)",
                                    if_else(grepl("leafy_greens",data_for_box2$key),"Leafy greens\n (0.5kg)",
-                                           if_else(grepl("eggs",data_for_box2$key),"Egg\n(12pcs)",
-                                                   if_else(grepl("bananas",data_for_box2$key),"Banana\n(12 pcs)",
+                                           if_else(grepl("eggs",data_for_box2$key),"Eggs\n(12pcs)",
+                                                   if_else(grepl("bananas",data_for_box2$key),"Bananas\n(12 pcs)",
                                                            if_else(grepl("fish",data_for_box2$key),"Dry fish\n(1kg)",
-                                                                   if_else(grepl("chicken",data_for_box2$key),"Chicken\n(12 pcs)","error",NULL
+                                                                   if_else(grepl("chicken",data_for_box2$key),"Chicken\n(1kg)","error",NULL
                                                                    )))))))))
 
 
@@ -74,6 +74,7 @@ if (items == "food_item"){
   p <- ggplot(data_for_box2, aes(x = fct_reorder(name,-value),y = value))
   p <- p + geom_boxplot(width=0.3)+
     theme(axis.title.x = element_blank(),
+          axis.text = element_text(size = 14),
           panel.background = element_rect(fill = "#FFFFFF", colour = "#505050",
                                           size = 2, linetype = "solid"),
           panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',
@@ -91,7 +92,7 @@ if (items == "food_item"){
     ylim(0,ymax)
 
 
-  ggsave(path = outputfolder_box,filename ="food_item.jpg" ,width=14.8942,height=7.62,units="cm",scale = 1.8)
+  ggsave(path = outputfolder_box,filename ="food_item.jpg" ,width=15,height=8,units="cm",scale = 1.8,dpi = 400)
 }
 
 # non_food_item -----------------------------------------------------------
@@ -125,6 +126,7 @@ if(items == "non_food_item"){
   q <- ggplot(data_for_box_non_fd2, aes(x = fct_reorder(name,-value),y = value))
   q <- q + geom_boxplot(width=0.1)+
     theme(axis.title.x = element_blank(),
+          axis.text = element_text(size = 14),
           panel.background = element_rect(fill = "#FFFFFF", colour = "#505050",
                                           size = 2, linetype = "solid"),
           panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',
@@ -141,5 +143,5 @@ if(items == "non_food_item"){
               aes(name,Inf,label = ss),size=4, vjust = 1.8)+
     ylim(0,ymax)
 
-  ggsave(path = outputfolder_box,filename ="non_food_item.jpg" ,width=7.9706,height=7.62,units="cm",scale = 1.8)
+  ggsave(path = outputfolder_box,filename ="non_food_item.jpg" ,width=13,height=7,units="cm",scale = 1.8,dpi = 400)
 }
