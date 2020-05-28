@@ -11,6 +11,7 @@ library(srvyr)
 library(survey)
 library(readxl)
 library(matrixStats) # needed for row medians
+
 source("BGD_2020_Markets_Covid/scripts/functions/utils.R")
 
 
@@ -18,14 +19,14 @@ source("BGD_2020_Markets_Covid/scripts/functions/utils.R")
 # Markets team needs to start tracking tool changes -----------------------
 
 # for now i will just keep changes i notice here
-name_changes<-tibble::tibble(round_1=c("sell_fish",
-                                       "cheapest_price_for_1kg__of_fish" ,
-                                       "days_of_stock_of_fish" ,
-                                       "cheapest_price_for_12_of_chicken"),
-               round_2= c("sell_dry_fish",
-                          "dry_fish_sale_in_past_week",
-                          "days_of_stock_of_dry_fish",
-                          "cheapest_price_for_4mx5m_of_chicken"))
+name_changes<-tibble::tibble(round_1=c("dry_fish_sale_in_past_week" ,
+                                       "cheapest_price_for_4mx5m_of_chicken",
+                                       "cheapest_price_for_12__of_eggs",
+                                       "price_of_1kg"),
+               round_2= c("cheapest_price_for_1kg_of_dry_fish",
+                         "cheapest_price_for_1kg_of_chicken",
+                         "cheapest_price_for_12_of_eggs",
+                         "cheapest_price_for_1kg_rice"))
 
 
 # automatically load current and previous round data
@@ -86,6 +87,17 @@ dfsvy_prev<-as_survey(prev_round)
 current_analysis<-butteR::mean_proportion_table(design = dfsvy,list_of_variables = cols_to_analyze)
 prev_analysis<-butteR::mean_proportion_table(design = dfsvy_prev,list_of_variables = cols_to_analyze)
 
+cols_not_in_previous<-colnames(current_analysis)[!colnames(current_analysis) %in% colnames(prev_analysis)]
+
+for(i in 1:length(cols_not_in_previous)){
+  col_temp<-cols_not_in_previous[i]
+  prev_analysis <- prev_analysis %>%
+    mutate(!!col_temp:= NA)
+}
+
+prev_analysis <- prev_analysis%>% select(colnames(current_analysis))
+
+# a <- data.frame(r2 = colnames(prev_analysis),r3 = colnames(current_analysis))
 
 # get datamerge values for table 1 in FS ----------------------------------
 
@@ -139,14 +151,16 @@ dm_output[["items_most_afftected_rankked"]]<-items_most_affected_ranked_labeled
 
 # median analysis - prev & current round comparison -----------------------
 
-food_prices<-c("cheapest_price_for_12_of_chicken",
+food_prices<-c("cheapest_price_for_4mx5m_of_chicken",
                 "cheapest_price_for_cooking_oil",
                "cheapest_price_for_1kg_of_lentils",
                 "cheapest_price_for_0.5kg_of_leafy_greens",
                 "cheapest_price_for_1kg_of_bananas",
                 "cheapest_price_for_12__of_eggs",
-                "cheapest_price_for_1kg__of_fish",
+                "dry_fish_sale_in_past_week",
                "price_of_1kg")
+
+
 #
 nfi_prices<-c("cheapest_price_for_100g_soap_bar_of_soap",
                 "cheapest_price_for_0_5l_of_bleachwashing_powder"

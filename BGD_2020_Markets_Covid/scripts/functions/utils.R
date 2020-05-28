@@ -81,7 +81,7 @@ percent_diff_dm<-function(x,y){
   green_tri<-".\\triangles\\green_triangle.png"
   grey_tri<-".\\triangles\\grey_triangle.png"
   results<-list()
-  x2<-round(((x-y)/x)*100,0)
+  x2<-round(((x-y)/y)*100,0)
   triangles<-x2 %>%
     mutate_all(.funs = ~case_when(.==0~grey_tri,
                                   .>0~red_tri,

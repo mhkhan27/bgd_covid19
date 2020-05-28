@@ -7,6 +7,7 @@ rm(list = ls())
 # library -----------------------------------------------------------------
 library(dplyr)
 library(stringr)
+library(tidyr)
 
 # read_data ---------------------------------------------------------------
 
@@ -67,8 +68,12 @@ basic_analysis_top5[is.na(basic_analysis_top5)] <- 0 #covert NA to 0
  #remove cols, which value is 0
  data_for_assistance_items_if_yes<- data_for_assistance_items_if_yes %>%  select_if(~sum(.) != 0)
 
+ if( ncol(data_for_assistance_items_if_yes) > 1 ){
+ sort_assistance_items_if_yes <- sort(data_for_assistance_items_if_yes[1,], decreasing = TRUE)}
 
- sort_assistance_items_if_yes <- sort(data_for_assistance_items_if_yes[1,], decreasing = TRUE)
+ if( ncol(data_for_assistance_items_if_yes) == 1 ){
+         sort_assistance_items_if_yes <- data_for_assistance_items_if_yes}
+
 
  if( ncol(sort_assistance_items_if_yes) > 5 ){
          top5_assistance_items_if_yes<- sort_assistance_items_if_yes[1:5]
@@ -88,23 +93,22 @@ basic_analysis_top5[is.na(basic_analysis_top5)] <- 0 #covert NA to 0
 data_merge_pie <- data_merge %>%  mutate_all(.,function(x){x<-x*100})
 data_merge_pie <- data_merge_pie %>%  mutate_all(.,function(x){x<-round(x,0)})
 
-remove_cols <- c("fresh_food_items.from.wholesaler...market.outside.of.camp",
-                 "fresh_food_items.from.wholesaler...market.within.camp", "fresh_food_items.from_wholesaler",
-                 "fresh_food_items.market_outside_of_camp", "non_fresh_food_items.from.wholesaler...market.outside.of.camp",
-                 "non_fresh_food_items.from.wholesaler...market.within.camp",
-                 "non_fresh_food_items.from_wholesaler", "non_fresh_food_items.market_outside_of_camp",
-                 "hygenic_nfi.from.wholesaler...market.outside.of.camp", "hygenic_nfi.from.wholesaler...market.within.camp",
-                 "hygenic_nfi.from_wholesaler", "hygenic_nfi.market_outside_of_camp")
+remove_cols <- c("fresh_food_items.from_wholesaler",
+                 "fresh_food_items.market_outside_of_camp",
+                 "non_fresh_food_items.from_wholesaler",
+                 "non_fresh_food_items.market_outside_of_camp",
+                 "hygenic_nfi.from_wholesaler",
+                 "hygenic_nfi.market_outside_of_camp")
 
 dm_pie_2 <- data_merge_pie %>% mutate(
-        fresh_food_items.inside_the_camp = fresh_food_items.from_wholesaler + fresh_food_items.from.wholesaler...market.within.camp,
-        fresh_food_items.outside_the_camp = fresh_food_items.market_outside_of_camp + fresh_food_items.from.wholesaler...market.outside.of.camp,
+        fresh_food_items.inside_the_camp = fresh_food_items.from_wholesaler,
+        fresh_food_items.outside_the_camp = fresh_food_items.market_outside_of_camp,
 
-        non_fresh_food_items.inside_the_camp = non_fresh_food_items.from_wholesaler + non_fresh_food_items.from.wholesaler...market.within.camp,
-        non_fresh_food_items.outside_the_camp = non_fresh_food_items.market_outside_of_camp + non_fresh_food_items.from.wholesaler...market.outside.of.camp,
+        non_fresh_food_items.inside_the_camp = non_fresh_food_items.from_wholesaler ,
+        non_fresh_food_items.outside_the_camp = non_fresh_food_items.market_outside_of_camp,
 
-        hygenic_nfi.inside_the_camp = hygenic_nfi.from_wholesaler + hygenic_nfi.from.wholesaler...market.within.camp,
-        hygenic_nfi.outside_the_camp = hygenic_nfi.market_outside_of_camp + hygenic_nfi.from.wholesaler...market.outside.of.camp
+        hygenic_nfi.inside_the_camp = hygenic_nfi.from_wholesaler,
+        hygenic_nfi.outside_the_camp = hygenic_nfi.market_outside_of_camp
 ) %>% select(-remove_cols)
 
 write.csv(dm_pie_2,paste0("BGD_2020_Markets_Covid/outputs/datamerge/disaggregated_records/","pie_top5_data_merge.csv"))
@@ -115,7 +119,7 @@ write.csv(dm_pie_2,paste0("BGD_2020_Markets_Covid/outputs/datamerge/disaggregate
 
 stoke_restoke_cols <- basic_analysis %>% select(c(starts_with("i.days_of_stock_of_"),
                                                   starts_with("i.restocking_time_of_"),
-                                                  "assistance_items.yes")) %>%
+                                                  "assistance_items.yes","faced_any_difficulties.yes")) %>%
         select(-ends_with("median"))
 
 stoke_restoke <- stoke_restoke_cols %>%  mutate_all(.,function(x){x<-x*100})
@@ -143,15 +147,21 @@ current_round_opc <- read.csv(clean_data_file_paths[round_number], stringsAsFact
 prev_round_opc <- read.csv(clean_data_file_paths[round_number-1], stringsAsFactors = FALSE,
                            na.strings = c("", " ", NA))
 
-old_cols_names_opc <-c("cheapest_price_for_1kg__of_fish","cheapest_price_for_12_of_chicken")
-new_cols_names_opc <-c("dry_fish_sale_in_past_week","cheapest_price_for_4mx5m_of_chicken")
+old_cols_names_opc <-c("dry_fish_sale_in_past_week" ,
+                       "cheapest_price_for_4mx5m_of_chicken",
+                       "cheapest_price_for_12__of_eggs",
+                       "price_of_1kg")
+new_cols_names_opc <-c("cheapest_price_for_1kg_of_dry_fish",
+                       "cheapest_price_for_1kg_of_chicken",
+                       "cheapest_price_for_12_of_eggs",
+                       "cheapest_price_for_1kg_rice")
 
 prev_round_opc <-prev_round_opc %>%  rename_at(vars(old_cols_names_opc),funs(str_replace(.,old_cols_names_opc,new_cols_names_opc)))
 
-cols_for_line_graph_opc <- c("X_uuid","price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
+cols_for_line_graph_opc <- c("X_uuid","cheapest_price_for_1kg_rice","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
                              "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
-                             "cheapest_price_for_12__of_eggs", "dry_fish_sale_in_past_week",
-                             "cheapest_price_for_4mx5m_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
+                             "cheapest_price_for_12_of_eggs", "cheapest_price_for_1kg_of_dry_fish",
+                             "cheapest_price_for_1kg_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
                              "cheapest_price_for_0_5l_of_bleachwashing_powder")
 #"cheapest_price_for_12_of_paracetamol",,"cheapest_price_for_4mx5m_of_tarpaulin",
 
@@ -165,7 +175,7 @@ date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = F
 
 data_with_round_opc<- cleaned_df_opc %>%  left_join(date_log,"X_uuid") #add_round
 
-data_with_round_opc$round <- capitalize(data_with_round_opc$round)
+# data_with_round_opc$round <- capitalize(data_with_round_opc$round)
 
 data_with_round_opc <- data_with_round_opc %>% select(-"X_uuid")
 
@@ -176,9 +186,9 @@ final_summary <- final %>% group_by(round,key) %>% summarise(
 
 final_summary2 <-final_summary %>% spread("round","media_value")
 
-difference <- sum(final_summary2$`Round 2` )-sum(final_summary2$`Round 1` )
+difference <- sum(final_summary2$`May - Week 3` )-sum(final_summary2$`May - Week 1` )
 
-over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`Round 1` )*100)
+over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`May - Week 1` )*100)
 
 
 # combind -----------------------------------------------------------------

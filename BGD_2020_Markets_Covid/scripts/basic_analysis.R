@@ -36,7 +36,10 @@ col_not_to_analyze <- c("days_of_stock_of_rice", "restocking_time_of_rice", "day
                         "restocking_time_of_soap", "days_of_stock_of_washing_powder",
                         "restocking_time_of_washing_powder","ki_code"
                         ,"X","X_uuid","survey_date", "survey_start","end_survey",
-                        "upazilla"
+                        "upazilla", "deviceid","informed_consent",
+                        "instance_name",
+                        "enumerator_id",
+                         "camp","X_id", "X_submission_time","X_index"
                         )
 
 col_to_analyze <- data_for_analysis %>% select(-col_not_to_analyze) %>% dplyr::select(-contains("_other"))   %>% colnames()
@@ -58,13 +61,13 @@ dfsvy$variables$upazilla<- forcats::fct_expand(dfsvy$variables$upazilla,c( "ukhi
 dfsvy$variables$sell_tarpaulin<- forcats::fct_expand(dfsvy$variables$sell_tarpaulin,c( "no", "yes"))
 dfsvy$variables$sell_paracetamol<- forcats::fct_expand(dfsvy$variables$sell_paracetamol,c( "no", "yes"))
 
-# cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit","dry_fish_unit",
-#                   "lentils_unit","leafy_greens_unit","bananas_unit",
-#                   "soap_unit","washing_powder_unit","chicken_unit")
-#
-# dfsvy$variables<-dfsvy$variables %>%
-#   mutate_at(.vars=cols_to_sell, .funs=forcats::fct_expand,c("no","yes")
-#   )
+cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit","dry_fish_unit",
+                  "lentils_unit","leafy_greens_unit","bananas_unit","oil_unit",
+                  "soap_unit","washing_powder_unit","chicken_unit","eggs_unit")
+
+dfsvy$variables<-dfsvy$variables %>%
+  mutate_at(.vars=cols_to_sell, .funs=forcats::fct_expand,c("no","yes")
+  )
 
 dfsvy$variables$income_changed_to_4_weeks<- forcats::fct_expand(dfsvy$variables$income_changed_to_4_weeks,c( "it_decreased", "it_increased","it_stayed_the_same","dontknow"))
 dfsvy$variables$customer_visits_change<- forcats::fct_expand(dfsvy$variables$customer_visits_change,c( "it_decreased", "it_increased","it_stayed_the_same","dontknow"))
@@ -95,14 +98,14 @@ basic_analysis_overall<-butteR::mean_proportion_table(design = dfsvy,list_of_var
 # median ------------------------------------------------------------------
 
 median_col <- c("vendors_operational",
-                "price_of_1kg",
-                "cheapest_price_for_12_of_chicken",
+                "cheapest_price_for_1kg_rice",
+                "cheapest_price_for_1kg_of_chicken",
                 "cheapest_price_for_cooking_oil",
                 "cheapest_price_for_1kg_of_lentils",
                 "cheapest_price_for_0.5kg_of_leafy_greens",
                 "cheapest_price_for_1kg_of_bananas",
-                "cheapest_price_for_12__of_eggs",
-                "cheapest_price_for_1kg__of_fish",
+                "cheapest_price_for_12_of_eggs",
+                "cheapest_price_for_1kg_of_dry_fish",
                 "cheapest_price_for_100g_soap_bar_of_soap",
                 "cheapest_price_for_0_5l_of_bleachwashing_powder",
                 "cheapest_price_for_12_of_paracetamol",
@@ -111,7 +114,7 @@ median_col <- c("vendors_operational",
                 "vendors_colsed",
                 "days_of_stock_of_rice", "days_of_stock_of_cooking_oil", "days_of_stock_of_lentils",
                 "days_of_stock_of_leafy_greens", "days_of_stock_of_bananas",
-                "days_of_stock_of_eggs", "days_of_stock_of_fish", "days_of_stock_of_soap",
+                "days_of_stock_of_eggs", "days_of_stock_of_dry_fish", "days_of_stock_of_soap",
                 "days_of_stock_of_washing_powder", "days_of_stock_of_paracetamol",
                 "days_of_stock_of_chicken", "days_of_stock_of_tarpaulin")
 

@@ -40,16 +40,16 @@ cleaned_df <- current_round
 
 # food item ---------------------------------------------------------------
 if (items == "food_item"){
-  box_fd_item_cols <- c("price_of_1kg","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
+  box_fd_item_cols <- c("cheapest_price_for_1kg_rice","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
                         "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
-                        "cheapest_price_for_12__of_eggs", "dry_fish_sale_in_past_week",
-                        "cheapest_price_for_4mx5m_of_chicken") %>% sort()
+                        "cheapest_price_for_12_of_eggs", "cheapest_price_for_1kg_of_dry_fish",
+                        "cheapest_price_for_1kg_of_chicken") %>% sort()
 
   data_for_box <- cleaned_df[box_fd_item_cols]
   data_for_box2<- data_for_box %>% gather() %>% dplyr::filter(!is.na(value))
 
   data_for_box2 <- data_for_box2 %>% dplyr::mutate(
-    name = if_else(grepl("price_of_1kg",data_for_box2$key),"Rice\n(1kg)",
+    name = if_else(grepl("price_for_1kg_rice",data_for_box2$key),"Rice\n(1kg)",
                    if_else(grepl("cooking_oil",data_for_box2$key),"Cooking oil\n(1L)",
                            if_else(grepl("lentils",data_for_box2$key),"Lentils \n (1kg)",
                                    if_else(grepl("leafy_greens",data_for_box2$key),"Leafy greens\n (0.5kg)",
@@ -143,5 +143,5 @@ if(items == "non_food_item"){
               aes(name,Inf,label = ss),size=4, vjust = 1.8)+
     ylim(0,ymax)
 
-  ggsave(path = outputfolder_box,filename ="non_food_item.jpg" ,width=13,height=7,units="cm",scale = 1.8,dpi = 400)
+  ggsave(path = outputfolder_box,filename ="non_food_item.jpg" ,width=8,height=8,units="cm",scale = 1.8,dpi = 400)
 }
