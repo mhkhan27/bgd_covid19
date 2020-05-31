@@ -120,19 +120,19 @@ selling_affected_table<-tibble(
   selling_item=c("sell_bananas", "sell_chicken", "sell_eggs", "sell_dry_fish",
                  "sell_leafy_greens", "cooking_oil",
                  "selling_rice",  "sell_soap"
-                  ),
-  #"sell_tarpaulin",  "sell_paracetamol", "sell_washing_powder","sell_lentils",
+                  ,"sell_tarpaulin",  "sell_paracetamol",
+                 "sell_washing_powder","sell_lentils"),
 
   affected_item= c("items_are_most_affected.bananas", "items_are_most_affected.Chicken",
                    "items_are_most_affected.eggs", "items_are_most_affected.fish",
                    "items_are_most_affected.leafy_greens",
                    "items_are_most_affected.oil",
                    "items_are_most_affected.rice",
-                   "items_are_most_affected.soap" )
-
-  #"items_are_most_affected.tarpaulin", "items_are_most_affected.paracetamol",  "items_are_most_affected.powder", "items_are_most_affected.lentils",
+                   "items_are_most_affected.soap","items_are_most_affected.tarpaulin",
+                   "items_are_most_affected.paracetamol",
+                   "items_are_most_affected.powder",
+                   "items_are_most_affected.lentils")
 )
-
 
 
 items_affected_subset_list<-list()
@@ -145,7 +145,13 @@ for(i in 1: nrow(selling_affected_table)){
 
 items_affected_binded<-bind_cols(items_affected_subset_list)
 rank_table<-prepare_rank_table(items_affected_binded)
-items_most_affected_ranked<-datamerge_from_rank_table(rank_table = rank_table,xlsform_lookup = xls_lt,rank_n = 6)
+
+# rank_table <- rank_table %>% dplyr::filter(value != 0)
+
+items_most_affected_ranked<-datamerge_from_rank_table(rank_table = rank_table,
+                                                      xlsform_lookup = xls_lt,rank_n = 6)
+
+
 items_most_affected_ranked_labeled<-items_most_affected_ranked$wide %>% select(contains("_lab_"))
 dm_output[["items_most_afftected_rankked"]]<-items_most_affected_ranked_labeled
 
