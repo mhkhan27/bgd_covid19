@@ -9,6 +9,7 @@ library(ggplot2)
 library(tidyr)
 library(stringr)
 library(Hmisc)
+library(lubridate)
 
 
 # path --------------------------------------------------------------------
@@ -86,14 +87,14 @@ final_group_gather <- final %>% group_by(key,round) %>% summarise(
   )
 
 final_data_for_chart <- final_group_gather %>% dplyr::mutate(
-    name = if_else(grepl("rice",key),"Non-Fresh Food Items",
-                   if_else(grepl("cooking_oil",key),"Non-Fresh Food Items",
-                           if_else(grepl("lentils",key),"Non-Fresh Food Items",
-                                   if_else(grepl("leafy_greens",key),"Fresh Food Items",
-                                           if_else(grepl("eggs",key),"Fresh Food Items",
-                                                   if_else(grepl("bananas",key),"Fresh Food Items",
-                                                           if_else(grepl("fish",key),"Non-Fresh Food Items",
-                                                                   if_else(grepl("chicken",key),"Fresh Food Items",
+    name = if_else(grepl("rice",key),"Non-fresh food items",
+                   if_else(grepl("cooking_oil",key),"Non-fresh food items",
+                           if_else(grepl("lentils",key),"Non-fresh food items",
+                                   if_else(grepl("leafy_greens",key),"Fresh food items",
+                                           if_else(grepl("eggs",key),"Fresh food items",
+                                                   if_else(grepl("bananas",key),"Fresh food items",
+                                                           if_else(grepl("fish",key),"Non-fresh food items",
+                                                                   if_else(grepl("chicken",key),"Fresh food items",
                                                                               if_else(grepl("powder",key),"Hygiene NFIs",
                                                                                       if_else(grepl("soap",key),"Hygiene NFIs",
                                                                                            if_else(grepl("paracetamol",key),"Hygiene NFIs",
@@ -106,13 +107,13 @@ final_data_for_chart <- final_data_for_chart %>% group_by(name,round) %>% summar
     value = median(value) )
 
 final_data_for_chart <- final_data_for_chart %>% mutate(
-    order = if_else(name == "Fresh Food Items",1,
-                    if_else(name == "Non-Fresh Food Items",2,
+    order = if_else(name == "Fresh food items",1,
+                    if_else(name == "Non-fresh food items",2,
                             if_else(name == "Hygiene NFIs",3,0,NULL))))
 
 final_data_for_chart <-final_data_for_chart %>% arrange(order)
 
-final_data_for_chart$name <-factor(final_data_for_chart$name, levels = c("Fresh Food Items","Non-Fresh Food Items","Hygiene NFIs"))
+final_data_for_chart$name <-factor(final_data_for_chart$name, levels = c("Fresh food items","Non-fresh food items","Hygiene NFIs"))
 
 ymax <- max(final_data_for_chart$value,na.rm = T)+5
 
