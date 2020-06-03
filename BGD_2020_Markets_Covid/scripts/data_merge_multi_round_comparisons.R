@@ -97,7 +97,6 @@ for(i in 1:length(cols_not_in_previous)){
 
 prev_analysis <- prev_analysis%>% select(colnames(current_analysis))
 
-# a <- data.frame(r2 = colnames(prev_analysis),r3 = colnames(current_analysis))
 
 # get datamerge values for table 1 in FS ----------------------------------
 
@@ -111,7 +110,8 @@ dm_output[["p3_tables"]]<-page_3_fs_dm
 
 selling_assistance_items<-current_round %>% select(starts_with("assistance_items_if_yes.")) %>% colnames()
 
-top_n_assistance_items<-return_top_sm(df = current_round,rank_col = "assistance_items_if_yes",rank_n = 3,xlsform_lookup = xls_lt)
+top_n_assistance_items<-return_top_sm(df = current_round,rank_col = "assistance_items_if_yes",rank_n = 3,
+                                      xlsform_lookup = xls_lt)
 
 dm_output[["top_assistance_items"]]<-top_n_assistance_items$wide
 
@@ -146,13 +146,15 @@ for(i in 1: nrow(selling_affected_table)){
 items_affected_binded<-bind_cols(items_affected_subset_list)
 rank_table<-prepare_rank_table(items_affected_binded)
 
-# rank_table <- rank_table %>% dplyr::filter(value != 0)
-
 items_most_affected_ranked<-datamerge_from_rank_table(rank_table = rank_table,
                                                       xlsform_lookup = xls_lt,rank_n = 6)
 
+rm_cls <- items_most_affected_ranked$wide %>% select_if(~. == 0) %>% colnames()
+rm_cls <- gsub("val","lab",rm_cls)
 
-items_most_affected_ranked_labeled<-items_most_affected_ranked$wide %>% select(contains("_lab_"))
+items_most_affected_ranked_labeled<-items_most_affected_ranked$wide %>% select(contains("_lab_")) %>%
+  select(-rm_cls)
+
 dm_output[["items_most_afftected_rankked"]]<-items_most_affected_ranked_labeled
 
 # median analysis - prev & current round comparison -----------------------

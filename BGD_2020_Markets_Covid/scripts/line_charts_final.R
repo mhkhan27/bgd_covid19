@@ -45,14 +45,15 @@ new_cols_names_r2 <-c("cheapest_price_for_1kg_of_dry_fish",
 round_1 <-round_1 %>%  rename_at(vars(old_cols_names_r1),funs(str_replace(.,old_cols_names_r1,new_cols_names_r1)))
 
 round_2 <-round_2 %>%  rename_at(vars(old_cols_names_r2),funs(str_replace(.,old_cols_names_r2,new_cols_names_r2)))
+round_2$cheapest_price_for_12_of_paracetamol <- NA
+round_2$cheapest_price_for_4mx5m_of_tarpaulin <- NA
 
 cols_for_line_graph <- c("X_uuid","cheapest_price_for_1kg_rice","cheapest_price_for_cooking_oil", "cheapest_price_for_1kg_of_lentils",
                          "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
                          "cheapest_price_for_12_of_eggs", "cheapest_price_for_1kg_of_dry_fish",
                          "cheapest_price_for_1kg_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
-                         "cheapest_price_for_0_5l_of_bleachwashing_powder"
-                         )
-#"cheapest_price_for_12_of_paracetamol",,"cheapest_price_for_4mx5m_of_tarpaulin",
+                         "cheapest_price_for_0_5l_of_bleachwashing_powder",
+                         "cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin")
 
 round_1_clean <-round_1[cols_for_line_graph]
 round_2_clean <- round_2[cols_for_line_graph]

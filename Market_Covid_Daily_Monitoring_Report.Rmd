@@ -19,43 +19,29 @@ knitr::opts_chunk$set(echo = FALSE,
 library(dplyr)
 library(sf)
 library(srvyr)
-library(anytime)
-library(readr)
 library(stringr)
-library(ggplot2)
 library(lubridate)
-library(rgdal)
 library(kableExtra)
 library(gsubfn)
 library(stringi)
 library(data.table)
 library(sf)
-library(tmap)
+library(tidyr)
 library(butteR)
-library(AMR)
 source("BGD_2020_Markets_Covid/scripts/functions/GIS_Project_Functions.R")
 
 round_text<- "May - Week 3"
-
+date_log <- c("yes","no")[2]
 write_csv_output <-"yes"
-
 day_to_run <- Sys.Date()
+
+
 #load data
-
 clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
-
-
 round_number<-length(clean_data_file_paths)
-
 
 main <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
                           na.strings = c("", " ", NA))
-
-
-# main <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_12_reach_bgd_markets_assessment_cleaned_r2.csv", stringsAsFactors = FALSE, 
-                   # na.strings = c("", " ", NA))
-# indv <- read.csv("inputs/01_daily_data/indv.csv", stringsAsFactors = FALSE, 
-                   # na.strings = c("", " ", NA))
 
 
 ############################date log##############################
@@ -65,6 +51,8 @@ main <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
 # date_log_full<- main %>% select(c("X_uuid","reported_date","round"))
 ###########################
 
+
+if (date_log == "yes"){
 date_log_old <-read.csv("outputs/01_data_logger/date_log.csv",
                         stringsAsFactors = FALSE,na.strings = c("", " ", NA)) %>% select("X_uuid","round","reported_date")
 
@@ -75,91 +63,58 @@ main <- main %>% dplyr::mutate(
 )
 
 main <- main %>% dplyr::mutate(
-  reported_date = if_else(is.na(main$reported_date),ymd(substr(main$survey_start,1,10)),dmy(main$reported_date))
-)
+  reported_date = if_else(is.na(main$reported_date),ymd(substr(main$survey_start,1,10)),dmy(main$reported_date)))
 
 # main$reported_date <- ymd(substr(main$survey_start,1,10))
 date_log_full<- main %>% select(c("X_uuid","reported_date","round"))
   
-  
 if(write_csv_output=="yes"){
-  date_log_path <- "outputs/01_data_logger/date_log.csv"
+
+date_log_path <- "outputs/01_data_logger/date_log.csv"
 date_log_track <- paste0("outputs/01_data_logger/",str_replace_all(day_to_run,"-","_"),"_date_logger.csv") 
 write.csv(date_log_full,date_log_path,row.names=FALSE)
 file.copy(from = date_log_path,to = date_log_track,overwrite = T)
 
-####write_data_for_recoding_with_round
-write.csv(main, "inputs/02_cleaned_data/raw_data_with_round/raw_data_with_round.csv")
-
-###write_daily_data_to_dropbox
-drpbox_path_for_daily_data <-  "C:\\Users\\MEHEDI\\Dropbox\\REACH_BGD\\REACH\\Ongoing\\COVID-19\\Market Monitoring Initiative (camps)\\Daily monitoring\\01_daily_data/"
-
-write.csv(main,paste0(drpbox_path_for_daily_data, str_replace_all(day_to_run,"-","_"),"_main_data.csv"))
-
-# write.csv(indv,paste0(drpbox_path_for_daily_data, str_replace_all(day_to_run,"-","_"),"_indv_data.csv"))
-
+# ####write_data_for_recoding_with_round
+# write.csv(main, "inputs/02_cleaned_data/raw_data_with_round/raw_data_with_round.csv")
+# 
+# ###write_daily_data_to_dropbox
+# drpbox_path_for_daily_data <-  "C:\\Users\\MEHEDI\\Dropbox\\REACH_BGD\\REACH\\Ongoing\\COVID-19\\Market Monitoring Initiative (camps)\\Daily monitoring\\01_daily_data/"
+# 
+# write.csv(main,paste0(drpbox_path_for_daily_data, str_replace_all(day_to_run,"-","_"),"_main_data.csv"))
+# 
+# # write.csv(indv,paste0(drpbox_path_for_daily_data, str_replace_all(day_to_run,"-","_"),"_indv_data.csv"))
+}
 }
 ``` 
 
-## Constraint 200
+
+## Constraint 60
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
+cols_less_than_60 <- c ("days_of_stock_of_soap","days_of_stock_of_washing_powder",
+                        "days_of_stock_of_paracetamol","days_of_stock_of_tarpaulin"
+                        )
 
-cols_less_than_200<-  c("cheapest_price_for_12__of_eggs",
-                         "vendors_colsed")
+grt_thn_60 <- main %>% dplyr::filter_at(vars(cols_less_than_60), any_vars(. > 60)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_60))
 
-grt_thn_200 <- main %>% dplyr::filter_at(vars(cols_less_than_200), all_vars(. > 200)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_200))
+grt_thn_60 <- gather(grt_thn_60,c(3:(ncol(grt_thn_60))),key = "col_name",value = "current_value") 
+grt_thn_60 <- grt_thn_60 %>% dplyr::filter(current_value > 60)
 
-
-grt_thn_200 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >200 which might be a mistake because that values should not be more than 200") %>% kable_styling(position = "center")
-
+grt_thn_60 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >60 which might be a mistake because that values should not be more than 60") %>% kable_styling(position = "center")
 
 ```
 
-## Constraint 100
-```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
- cols_less_than_100<- c( "ki_code", "price_of_1kg", "days_of_stock_of_rice",
-                         "cheapest_price_for_cooking_oil",
-                         "days_of_stock_of_cooking_oil",
-                         "cheapest_price_for_1kg_of_lentils",
-                         "days_of_stock_of_lentils",
-                         "cheapest_price_for_1kg_of_bananas",
-                         "cheapest_price_for_1kg__of_dry_fish",
-                         "days_of_stock_of_soap",
-                         "cheapest_price_for_0_5l_of_bleachwashing_powder",
-                         "days_of_stock_of_washing_powder")
-
-grt_thn_100 <- main %>% dplyr::filter_at(vars(cols_less_than_100), all_vars(. > 100)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_100))
-
-grt_thn_100 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >100 which might be a mistake because that values should not be more than 100") %>% kable_styling(position = "center")
-```
-
-
-## Constraint 50
-```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
-cols_less_than_50 <- "cheapest_price_for_100g_soap_bar_of_soap"
-
-
-grt_thn_50 <- main %>% dplyr::filter_at(vars(cols_less_than_50), all_vars(. > 50)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_50))
-
-grt_thn_50 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >50 which might be a mistake because that values should not be more than 50") %>% kable_styling(position = "center")
-```
 
 
 ## Constraint 30
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
- cols_less_than_30 <- c ("restocking_time_of_rice",
-                         "restocking_time_of_cooking_oil",
-                         "restocking_time_of_lentils",
-                         "cheapest_price_for_0.5kg_of_leafy_greens",
-                         "restocking_time_of_leafy_greens",
-                         "restocking_time_of_bananas",
-                         "days_of_stock_of_eggs",
-                         "restocking_time_of_eggs",
-                         "restocking_time_of_dry_fish",
-                         "restocking_time_of_soap",
-                         "restocking_time_of_washing_powder")
+cols_less_than_30 <- c ("days_of_stock_of_rice","restocking_time_of_rice","days_of_stock_of_cooking_oil",
+"restocking_time_of_cooking_oil","days_of_stock_of_lentils","restocking_time_of_lentils","restocking_time_of_leafy_greens","restocking_time_of_bananas","days_of_stock_of_eggs","restocking_time_of_eggs","restocking_time_of_dry_fish","restocking_time_of_soap","restocking_time_of_washing_powder","restocking_time_of_paracetamol","restocking_time_of_tarpaulin","restocking_time_of_chicken")
 
-grt_thn_30 <- main %>% dplyr::filter_at(vars(cols_less_than_30), all_vars(. > 30)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_30))
+grt_thn_30 <- main %>% dplyr::filter_at(vars(cols_less_than_30), any_vars(. > 30)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_30))
+
+grt_thn_30 <- gather(grt_thn_30,c(3:(ncol(grt_thn_30))),key = "col_name",value = "current_value") 
+grt_thn_30 <- grt_thn_30 %>% dplyr::filter(current_value > 30)
 
 grt_thn_30 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >30 which might be a mistake because that values should not be more than 30") %>% kable_styling(position = "center")
 
@@ -168,8 +123,11 @@ grt_thn_30 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some e
 
 ## Constraint 14
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
- cols_less_than_14 <- "days_of_stock_of_bananas"
-grt_thn_14 <- main %>% dplyr::filter_at(vars(cols_less_than_14), all_vars(. > 14)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_14))
+cols_less_than_14 <- "days_of_stock_of_bananas"
+grt_thn_14 <- main %>% dplyr::filter_at(vars(cols_less_than_14), any_vars(. > 14)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_14))
+
+grt_thn_14 <- gather(grt_thn_14,c(3:(ncol(grt_thn_14))),key = "col_name",value = "current_value") 
+grt_thn_14 <- grt_thn_14 %>% dplyr::filter(current_value > 14)
 
 grt_thn_14 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >14 which might be a mistake because that values should not be more than 14") %>% kable_styling(position = "center")
 
@@ -179,12 +137,119 @@ grt_thn_14 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some e
 ## Constraint 7
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
  cols_less_than_7 <- c("days_of_stock_of_leafy_greens",
-                       "days_of_stock_of_dry_fish" )
+                       "days_of_stock_of_dry_fish",
+                       "days_of_stock_of_chicken")
 
-grt_thn_7 <- main %>% dplyr::filter_at(vars(cols_less_than_7), all_vars(. > 7)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_7))
+grt_thn_7 <- main %>% dplyr::filter_at(vars(cols_less_than_7), any_vars(. > 7)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_7))
+
+grt_thn_7 <- gather(grt_thn_7,c(3:(ncol(grt_thn_7))),key = "col_name",value = "current_value") 
+grt_thn_7 <- grt_thn_7 %>% dplyr::filter(current_value > 7)
 
 grt_thn_7 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some enumerators who have recorded value >07 which might be a mistake because that values should not be more than 07") %>% kable_styling(position = "center")
 
 ```
 
+
+
+
+## Between half and twice the price of the previous rounds means
+```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
+
+
+#read_PREvious round data
+
+previous_data_location <- clean_data_file_paths[-length(clean_data_file_paths)]
+for (i in 1:length(previous_data_location)){
+  assign(paste0("round_",i), read.csv(previous_data_location[i]))
+}
+
+#read_current round data
+
+round_number<-length(clean_data_file_paths)
+current_round <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
+                          na.strings = c("", " ", NA))
+
+#data_cleaning
+old_cols_names_r1 <-c("cheapest_price_for_1kg__of_fish","cheapest_price_for_12_of_chicken",
+                      "cheapest_price_for_12__of_eggs","price_of_1kg")
+new_cols_names_r1 <-c("cheapest_price_for_1kg_of_dry_fish","cheapest_price_for_1kg_of_chicken",
+                      "cheapest_price_for_12_of_eggs","cheapest_price_for_1kg_rice")
+
+old_cols_names_r2 <-c("dry_fish_sale_in_past_week" ,
+                      "cheapest_price_for_4mx5m_of_chicken",
+                      "cheapest_price_for_12__of_eggs",
+                      "price_of_1kg")
+new_cols_names_r2 <-c("cheapest_price_for_1kg_of_dry_fish",
+                      "cheapest_price_for_1kg_of_chicken",
+                      "cheapest_price_for_12_of_eggs",
+                      "cheapest_price_for_1kg_rice")
+
+round_1 <-round_1 %>%  rename_at(vars(old_cols_names_r1),funs(str_replace(.,old_cols_names_r1,new_cols_names_r1)))
+
+round_2 <-round_2 %>%  rename_at(vars(old_cols_names_r2),funs(str_replace(.,old_cols_names_r2,new_cols_names_r2)))
+
+
+cols_needed <- c("cheapest_price_for_1kg_rice","cheapest_price_for_cooking_oil",    
+                         "cheapest_price_for_1kg_of_lentils",
+                         "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
+                         "cheapest_price_for_12_of_eggs", "cheapest_price_for_1kg_of_dry_fish",
+                         "cheapest_price_for_1kg_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
+                         "cheapest_price_for_0_5l_of_bleachwashing_powder")
+#,"cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin"
+
+
+round_1_clean <-round_1[cols_needed]
+round_2_clean <- round_2[cols_needed]
+round_3_clean <- round_3[cols_needed]
+
+previous_rounds_clened <- rbind(round_1_clean,round_2_clean,round_3_clean)
+
+previous_combind_mean <- previous_rounds_clened %>% dplyr::summarise_all(
+  .,function(x){x<-mean(x,na.rm = T)})
+
+for(i in colnames(previous_combind_mean)){
+    col_max <- paste0(i,"_max")
+    col_min <- paste0(i,"_min")
+    previous_combind_mean[[col_max]] <- previous_combind_mean[[i]] *2
+    previous_combind_mean[[col_min]] <- previous_combind_mean[[i]] *.5
+  }
+
+current_round_cleaned <- current_round[c("X_uuid","enumerator_id",cols_needed)]
+
+for (i in cols_needed) {
+  current_round_cleaned[[i]] <- as.integer(current_round_cleaned[[i]])
+}
+  
+a <-list()
+for (i in cols_needed) {
+    col_max <- paste0(i,"_max")
+    col_min <- paste0(i,"_min")
+a[[i]]<- current_round_cleaned %>% dplyr::filter(
+current_round_cleaned[[i]] < previous_combind_mean[[col_min]]|
+ current_round_cleaned[[i]] > previous_combind_mean[[col_max]])
+}  
+
+
+btw_max_min_rbind <- rbindlist(a, use.names=TRUE, fill=TRUE, idcol="col_names")
+
+
+btw_max_min_rbind2 <- gather(btw_max_min_rbind,c(3:(ncol(btw_max_min_rbind))),key = "col_name",value = "current_value")
+btw_max_min_rbind3<- btw_max_min_rbind2 %>% dplyr::filter(!is.na(btw_max_min_rbind2$current_value))
+
+btw_max_min <- btw_max_min_rbind3 %>% dplyr::filter (btw_max_min_rbind3$col_name == btw_max_min_rbind3$col_names)
+
+btw_max_min <- btw_max_min %>% select(-"col_names")
+
+previous_combind_mean_gather<- previous_combind_mean %>% gather(value = "mean_value")
+
+btw_max_min2<- btw_max_min %>% left_join(previous_combind_mean_gather,by =c("col_name"="key"))
+
+btw_max_min3 <- btw_max_min2 %>% dplyr::mutate(
+  max_lim = btw_max_min2$mean_value*2,
+  min_lim = btw_max_min2$mean_value*.5
+)
+
+btw_max_min3 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "price is not in between half and twice the price of the previous rounds means") %>% kable_styling(position = "center")
+
+```
 
