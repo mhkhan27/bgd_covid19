@@ -58,8 +58,10 @@ cols_to_analyze<-data_for_analysis[col_to_analyze] %>% select(-ends_with("Other"
 
 dfsvy$variables$upazilla<- forcats::fct_expand(dfsvy$variables$upazilla,c( "ukhiya", "teknaf"))
 
-dfsvy$variables$sell_tarpaulin<- forcats::fct_expand(dfsvy$variables$sell_tarpaulin,c( "no", "yes"))
-dfsvy$variables$sell_paracetamol<- forcats::fct_expand(dfsvy$variables$sell_paracetamol,c( "no", "yes"))
+# dfsvy$variables$sell_tarpaulin<- forcats::fct_expand(dfsvy$variables$sell_tarpaulin,c( "no", "yes"))
+# dfsvy$variables$sell_paracetamol<- forcats::fct_expand(dfsvy$variables$sell_paracetamol,c( "no", "yes"))
+dfsvy$variables$shop_been_open_in_the_past_7_days<- forcats::fct_expand(dfsvy$variables$shop_been_open_in_the_past_7_days,
+                                                                        c( "yes", "no"))
 
 cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit","dry_fish_unit",
                   "lentils_unit","leafy_greens_unit","bananas_unit","oil_unit",
@@ -88,6 +90,8 @@ dfsvy$variables<-dfsvy$variables %>%
 dfsvy$variables<-dfsvy$variables %>%
   mutate_at(.vars=cols_to_times, .funs=forcats::fct_expand,c("0_3_days","4_7_days","7_and_more")
   )
+
+dfsvy$variables$non_fresh_food_items_1<- forcats::fct_expand(dfsvy$variables$non_fresh_food_items_1,c( "market_outside_of_camp", "from_wholesaler"))
 
 # basic analysis ----------------------------------------------------------
 

@@ -30,7 +30,7 @@ library(tidyr)
 library(butteR)
 source("BGD_2020_Markets_Covid/scripts/functions/GIS_Project_Functions.R")
 
-round_text<- "May - Week 3"
+round_text<- "June - Week 1"
 date_log <- c("yes","no")[2]
 write_csv_output <-"yes"
 day_to_run <- Sys.Date()
@@ -42,8 +42,6 @@ round_number<-length(clean_data_file_paths)
 
 main <- read.csv(clean_data_file_paths[round_number], stringsAsFactors = FALSE,
                           na.strings = c("", " ", NA))
-
-
 ############################date log##############################
 ######for first round only#####
 # main$reported_date <- ymd(substr(main$survey_start,1,10))
@@ -202,7 +200,7 @@ round_1_clean <-round_1[cols_needed]
 round_2_clean <- round_2[cols_needed]
 round_3_clean <- round_3[cols_needed]
 
-previous_rounds_clened <- rbind(round_1_clean,round_2_clean,round_3_clean)
+previous_rounds_clened <- bind_rows(round_1_clean,round_2_clean,round_3_clean)
 
 previous_combind_mean <- previous_rounds_clened %>% dplyr::summarise_all(
   .,function(x){x<-mean(x,na.rm = T)})
@@ -215,6 +213,9 @@ for(i in colnames(previous_combind_mean)){
   }
 
 current_round_cleaned <- current_round[c("X_uuid","enumerator_id",cols_needed)]
+
+current_round$cheapest_price_for_4mx5m_of_tarpaulin
+current_round$cheapest_price_for_12_of_paracetamol
 
 for (i in cols_needed) {
   current_round_cleaned[[i]] <- as.integer(current_round_cleaned[[i]])

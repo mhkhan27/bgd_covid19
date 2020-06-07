@@ -1,4 +1,4 @@
-#new round data should be added first before running it.
+#this script can run with Crlt + A,  No change is required
 
 rm(list = ls())
 
@@ -19,13 +19,14 @@ outputfolder_box <-"BGD_2020_Markets_Covid/outputs/datamerge/graphs/"
 
 # data_preparation ---------------------------------------------------------------
 
-round_1 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_04_23_reach_bgd_market_assessment_cleaned_r1.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
+clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
 
-round_2 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_12_reach_bgd_markets_assessment_cleaned_r2.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
-round_3 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_24_reach_bgd_markets_assessment_cleaned_r3.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
+round<- c()
+
+for (i in 1:length(clean_data_file_paths)){
+  assign(paste0("round_",i), read.csv(clean_data_file_paths[i]))
+  round <- c(round,paste0("round_",i))
+}
 
 old_cols_names_r1 <-c("cheapest_price_for_1kg__of_fish","cheapest_price_for_12_of_chicken",
                       "cheapest_price_for_12__of_eggs","price_of_1kg")
@@ -45,6 +46,7 @@ new_cols_names_r2 <-c("cheapest_price_for_1kg_of_dry_fish",
 round_1 <-round_1 %>%  rename_at(vars(old_cols_names_r1),funs(str_replace(.,old_cols_names_r1,new_cols_names_r1)))
 
 round_2 <-round_2 %>%  rename_at(vars(old_cols_names_r2),funs(str_replace(.,old_cols_names_r2,new_cols_names_r2)))
+
 round_2$cheapest_price_for_12_of_paracetamol <- NA
 round_2$cheapest_price_for_4mx5m_of_tarpaulin <- NA
 
@@ -55,11 +57,20 @@ cols_for_line_graph <- c("X_uuid","cheapest_price_for_1kg_rice","cheapest_price_
                          "cheapest_price_for_0_5l_of_bleachwashing_powder",
                          "cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin")
 
-round_1_clean <-round_1[cols_for_line_graph]
-round_2_clean <- round_2[cols_for_line_graph]
-round_3_clean <- round_3[cols_for_line_graph]
+round_clean <- c()
+for (i in round){
+  assign(paste0(i,"_clean"), get(i)[cols_for_line_graph])
+  round_clean <- c(round_clean,paste0(i,"_clean"))
+}
 
-cleaned_df <- rbind(round_1_clean,round_2_clean,round_3_clean)
+cleaned_df <- data.frame()
+
+for (i in round_clean) {
+  cleaned_df<- rbind(cleaned_df,get(i))
+}
+
+
+# cleaned_df <- rbind(round_1_clean,round_2_clean,round_3_clean)
 
 
 date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = FALSE,
@@ -134,7 +145,8 @@ final_data_for_chart<- final_data_for_chart %>%
     date=case_when(
       round=="April - Week 3" ~"2020-04-20",
       round=="May - Week 1"~ "2020-05-04",
-      TRUE~"2020-05-18"
+      round=="May - Week 3"~ "2020-05-18",
+      TRUE~"2020-06-07"
     ) %>% lubridate::ymd(),
     date_f=floor_date(date,"week"),
     date_c=ceiling_date(date,"week"),
@@ -144,6 +156,9 @@ final_data_for_chart<- final_data_for_chart %>%
     year= year(date_f),
     week= week(date_f)
   )
+
+final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
+
 ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
   geom_path(aes(color=name,linetype= name),size=1)+
   geom_point(aes(color = name),size = 2.2)+
@@ -151,7 +166,7 @@ ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-05-27")),expand = c(0,0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-06")))+
   scale_y_continuous(limits=c(0,ymax), expand = c(0, 0))+
   theme(axis.title.x = element_blank(),
         axis.line.x = element_blank(),
@@ -225,7 +240,8 @@ final_data_for_chart<- final_data_for_chart %>%
     date=case_when(
       round=="April - Week 3" ~"2020-04-20",
       round=="May - Week 1"~ "2020-05-04",
-      TRUE~"2020-05-18"
+      round=="May - Week 3"~ "2020-05-18",
+      TRUE~"2020-06-07"
     ) %>% lubridate::ymd(),
     date_f=floor_date(date,"week"),
     date_c=ceiling_date(date,"week"),
@@ -235,6 +251,9 @@ final_data_for_chart<- final_data_for_chart %>%
     year= year(date_f),
     week= week(date_f)
   )
+
+final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
+
 ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
   geom_path(aes(color=name,linetype= name),size=1)+
   geom_point(aes(color = name),size = 2.2)+
@@ -242,7 +261,7 @@ ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-05-27")),expand = c(0,0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-08")))+
   scale_y_continuous(limits=c(0,ymax), expand = c(0, 0))+
   theme(axis.title.x = element_blank(),
         axis.line.x = element_blank(),

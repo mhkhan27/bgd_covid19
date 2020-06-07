@@ -19,10 +19,10 @@ source("BGD_2020_Markets_Covid/scripts/functions/utils.R")
 # Markets team needs to start tracking tool changes -----------------------
 
 # for now i will just keep changes i notice here
-name_changes<-tibble::tibble(round_1=c("dry_fish_sale_in_past_week" ,
-                                       "cheapest_price_for_4mx5m_of_chicken",
-                                       "cheapest_price_for_12__of_eggs",
-                                       "price_of_1kg"),
+name_changes<-tibble::tibble(round_1=c("cheapest_price_for_1kg_of_dry_fish",
+                                       "cheapest_price_for_1kg_of_chicken",
+                                       "cheapest_price_for_12_of_eggs",
+                                       "cheapest_price_for_1kg_rice"),
                round_2= c("cheapest_price_for_1kg_of_dry_fish",
                          "cheapest_price_for_1kg_of_chicken",
                          "cheapest_price_for_12_of_eggs",
@@ -159,14 +159,14 @@ dm_output[["items_most_afftected_rankked"]]<-items_most_affected_ranked_labeled
 
 # median analysis - prev & current round comparison -----------------------
 
-food_prices<-c("cheapest_price_for_4mx5m_of_chicken",
+food_prices<-c("cheapest_price_for_1kg_of_chicken",
                 "cheapest_price_for_cooking_oil",
                "cheapest_price_for_1kg_of_lentils",
                 "cheapest_price_for_0.5kg_of_leafy_greens",
                 "cheapest_price_for_1kg_of_bananas",
-                "cheapest_price_for_12__of_eggs",
-                "dry_fish_sale_in_past_week",
-               "price_of_1kg")
+                "cheapest_price_for_12_of_eggs",
+                "cheapest_price_for_1kg_of_dry_fish",
+               "cheapest_price_for_1kg_rice")
 
 
 #

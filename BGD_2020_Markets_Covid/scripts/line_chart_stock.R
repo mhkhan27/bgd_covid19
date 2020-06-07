@@ -1,4 +1,4 @@
-#new round data should be added first before run it.
+#this script can run with Crlt + A,  No change is required
 
 rm(list = ls())
 
@@ -18,13 +18,14 @@ outputfolder_box <-"BGD_2020_Markets_Covid/outputs/datamerge/graphs/"
 
 # data_preparation ---------------------------------------------------------------
 
-round_1 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_04_23_reach_bgd_market_assessment_cleaned_r1.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
+clean_data_file_paths<-list.files("BGD_2020_Markets_Covid/inputs/clean_data",full.names = T) %>% sort()
 
-round_2 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_12_reach_bgd_markets_assessment_cleaned_r2.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
-round_3 <- read.csv("BGD_2020_Markets_Covid/inputs/clean_data/2020_05_24_reach_bgd_markets_assessment_cleaned_r3.csv", stringsAsFactors = FALSE,
-                    na.strings = c("", " ", NA))
+round<- c()
+
+for (i in 1:length(clean_data_file_paths)){
+  assign(paste0("round_",i), read.csv(clean_data_file_paths[i]))
+  round <- c(round,paste0("round_",i))
+}
 
 old_cols_names <-c("days_of_stock_of_fish","restocking_time_of_fish")
 
@@ -40,12 +41,20 @@ cols_for_line_graph <- c("X_uuid","days_of_stock_of_rice", "days_of_stock_of_coo
                          "days_of_stock_of_soap","days_of_stock_of_washing_powder"
                         )
 # "days_of_stock_of_tarpaulin","days_of_stock_of_paracetamol"
+#
+round_clean <- c()
+for (i in round){
+  assign(paste0(i,"_clean"), get(i)[cols_for_line_graph])
+  round_clean <- c(round_clean,paste0(i,"_clean"))
+}
 
-round_1_clean <-round_1[cols_for_line_graph]
-round_2_clean <- round_2[cols_for_line_graph]
-round_3_clean <- round_3[cols_for_line_graph]
+cleaned_df <- data.frame()
 
-cleaned_df <- rbind(round_1_clean,round_2_clean,round_3_clean)
+for (i in round_clean) {
+  cleaned_df<- rbind(cleaned_df,get(i))
+}
+
+# cleaned_df <- rbind(round_1_clean,round_2_clean,round_3_clean,round_4_clean)
 
 
 date_log <- read.csv("outputs/01_data_logger/date_log.csv", stringsAsFactors = FALSE,
@@ -122,7 +131,8 @@ final_data_for_chart<- final_data_for_chart %>%
     date=case_when(
       round=="April - Week 3" ~"2020-04-20",
       round=="May - Week 1"~ "2020-05-04",
-      TRUE~"2020-05-18"
+      round=="May - Week 3"~ "2020-05-18",
+      TRUE~"2020-06-07"
     ) %>% lubridate::ymd(),
     date_f=floor_date(date,"week"),
     date_c=ceiling_date(date,"week"),
@@ -132,6 +142,9 @@ final_data_for_chart<- final_data_for_chart %>%
     year= year(date_f),
     week= week(date_f)
   )
+
+final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
+
 ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
   geom_path(aes(color=name,linetype= name),size=1)+
   geom_point(aes(color = name),size = 2.2)+
@@ -139,7 +152,7 @@ ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-05-27")))+
+               limits=c(as_date("2020-04-01"),as_date("2020-07-01")))+
   scale_y_continuous(limits=c(0,ymax), expand = c(0, 0))+
   theme(axis.title.x = element_blank(),
         axis.line.x = element_blank(),
@@ -150,8 +163,10 @@ ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
         panel.background = element_blank(),
         panel.grid.minor.x= element_line(size = 0.5, linetype = "dashed",
                                          colour = "#c1c1c1"),
-        panel.grid.minor.y= element_blank(),
-        panel.grid.major.y = element_line(size = 0.5, linetype = "dashed",
+        # panel.grid.major.x = element_line(size = 0.5, linetype = "dashed",
+        #                                   colour = "#c1c1c1"),
+        # panel.grid.minor.y= element_blank(),
+        panel.grid.minor.y = element_line(size = 0.5, linetype = "dashed",
                                           colour = "#c1c1c1"),
         panel.border = element_rect(colour = "#58585a", fill=NA, size=1),
         panel.spacing = unit(0,"cm"),
