@@ -29,10 +29,11 @@ library(sf)
 library(tidyr)
 library(butteR)
 source("BGD_2020_Markets_Covid/scripts/functions/GIS_Project_Functions.R")
+source("BGD_2020_Markets_Covid/scripts/functions/Load_Audit.R")
 
-round_text<- "June - Week 1"
+round_text<- "July - Week 1"
 date_log <- c("yes","no")[2]
-write_csv_output <-"yes"
+write_csv_output <-c("yes","no")[2]
 day_to_run <- Sys.Date()
 
 
@@ -86,6 +87,54 @@ file.copy(from = date_log_path,to = date_log_track,overwrite = T)
 }
 ``` 
 
+## Audit 
+```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
+
+path_unzip <- "BGD_2020_Markets_Covid/outputs/audit_files"
+audit_zip_dir<-"BGD_2020_Markets_Covid/inputs/audit/"
+audit_zipfile <-paste0(audit_zip_dir,"/a4jWC2JpNqovUHNAbkHv92_",str_replace_all (day_to_run,"-","_"),".zip")
+copy_zip_to<-paste0("BGD_2020_Markets_Covid/outputs/audit_files/",day_to_run,".zip")
+audit_node<-"/a4jWC2JpNqovUHNAbkHv92/"
+
+audit_yes<-Load_Audit(data=main, 
+                      path.to.zip = audit_zipfile,
+                      path.to.unzip = path_unzip,
+                      copy.zip = TRUE,
+                      path.to.copy.zip = copy_zip_to,
+                      delete.unzipped=TRUE
+)
+
+#########last eituku porjnto dekhc
+
+dfl<-list()
+for (i in 1: length(audit_yes)){
+  d<-audit_yes[[i]]
+  
+d$node<-gsub("\\[1]","",d$node)
+
+  start_question <- d %>% filter(node==paste0(audit_node,"informed_consent_group/shop_been_open_in_the_past_7_days")& !is.na(event)) %>% 
+    select(end) 
+  start_question<-min(start_question$end)
+  end_question<-d %>% filter(node==paste0(audit_node,"informed_consent_group/contact_details_of_other_vendors")& !is.na(node)) %>% 
+    select(end)
+  end_question<-max(end_question$end)
+  duration_ms<-end_question-start_question
+  duration_secs<-duration_ms/1000
+  duration_minutes<- round(duration_secs/60,1)
+  dfl[[i]]<-data.frame(uuid=names(audit_yes)[i],duration_ms=duration_ms,durations_secs=duration_secs,duration_minutes= duration_minutes)
+}
+
+duration_df2<-do.call("rbind", dfl)
+
+htdf<-main %>%  
+  left_join(duration_df2, by= c("X_uuid"="uuid")) %>% as.data.frame()
+
+is.na(htdf$duration_minutes) <- sapply(htdf$duration_minutes,is.infinite) #inf or -inf to NA
+
+duration_statistics<- htdf %>% filter (informed_consent == "yes") %>% select("enumerator_id","X_uuid","duration_minutes")
+
+duration_statistics %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Survey Duration") %>% kable_styling(position = "center")
+```
 
 ## Constraint 60
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
@@ -156,9 +205,11 @@ grt_thn_7 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some en
 
 #read_PREvious round data
 
+round <-c()
 previous_data_location <- clean_data_file_paths[-length(clean_data_file_paths)]
 for (i in 1:length(previous_data_location)){
   assign(paste0("round_",i), read.csv(previous_data_location[i]))
+  round <- c(round,paste0("round_",i))
 }
 
 #read_current round data
@@ -186,23 +237,32 @@ round_1 <-round_1 %>%  rename_at(vars(old_cols_names_r1),funs(str_replace(.,old_
 
 round_2 <-round_2 %>%  rename_at(vars(old_cols_names_r2),funs(str_replace(.,old_cols_names_r2,new_cols_names_r2)))
 
+round_2<- round_2 %>% mutate( 
+  cheapest_price_for_12_of_paracetamol = NA,
+  cheapest_price_for_4mx5m_of_tarpaulin = NA )
 
 cols_needed <- c("cheapest_price_for_1kg_rice","cheapest_price_for_cooking_oil",    
                          "cheapest_price_for_1kg_of_lentils",
                          "cheapest_price_for_0.5kg_of_leafy_greens", "cheapest_price_for_1kg_of_bananas",
                          "cheapest_price_for_12_of_eggs", "cheapest_price_for_1kg_of_dry_fish",
                          "cheapest_price_for_1kg_of_chicken","cheapest_price_for_100g_soap_bar_of_soap",
-                         "cheapest_price_for_0_5l_of_bleachwashing_powder")
-#,"cheapest_price_for_12_of_paracetamol","cheapest_price_for_4mx5m_of_tarpaulin"
+                         "cheapest_price_for_0_5l_of_bleachwashing_powder","cheapest_price_for_12_of_paracetamol",
+                       "cheapest_price_for_4mx5m_of_tarpaulin")
 
 
-round_1_clean <-round_1[cols_needed]
-round_2_clean <- round_2[cols_needed]
-round_3_clean <- round_3[cols_needed]
+round_clean <- c()
+for (i in round){
+  assign(paste0(i,"_clean"), get(i)[cols_needed])
+  round_clean <- c(round_clean,paste0(i,"_clean"))
+}
 
-previous_rounds_clened <- bind_rows(round_1_clean,round_2_clean,round_3_clean)
+cleaned_df <- data.frame()
 
-previous_combind_mean <- previous_rounds_clened %>% dplyr::summarise_all(
+for (i in round_clean) {
+  cleaned_df<- rbind(cleaned_df,get(i))
+}
+
+previous_combind_mean <- cleaned_df %>% dplyr::summarise_all(
   .,function(x){x<-mean(x,na.rm = T)})
 
 for(i in colnames(previous_combind_mean)){
@@ -214,8 +274,6 @@ for(i in colnames(previous_combind_mean)){
 
 current_round_cleaned <- current_round[c("X_uuid","enumerator_id",cols_needed)]
 
-current_round$cheapest_price_for_4mx5m_of_tarpaulin
-current_round$cheapest_price_for_12_of_paracetamol
 
 for (i in cols_needed) {
   current_round_cleaned[[i]] <- as.integer(current_round_cleaned[[i]])

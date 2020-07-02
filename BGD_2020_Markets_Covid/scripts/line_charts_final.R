@@ -11,7 +11,7 @@ library(stringr)
 library(Hmisc)
 library(lubridate)
 
-items<- c("food_item","non_food_item")[1]
+items<- c("food_item","non_food_item")[2]
 
 # path --------------------------------------------------------------------
 
@@ -158,43 +158,56 @@ final_data_for_chart<- final_data_for_chart %>%
   )
 
 final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
+max_val<-max(final_data_for_chart$value,na.rm=T) %>% round(-1)+2
+rects <- data.frame(xstart = as.Date(c("2020-04-01","2020-05-01","2020-06-01","2020-07-01")),
+                    xend =as.Date(c("2020-05-01","2020-06-01","2020-07-01","2020-08-01")),col=rep(c("A","B"),2))
+ggplot() +
+  geom_rect(data=rects, mapping=aes(ymin=0, ymax=max_val, xmin=xstart,
+                                    xmax=xend, fill=col), alpha =0.2,show.legend = FALSE)+
+  scale_fill_manual(values=c("#b6b6b6","white"))+
+  geom_path(final_data_for_chart, mapping = aes(x = cut_Date, y = value,group =name,color=name,linetype= name),size=1) +
+  geom_point(final_data_for_chart,mapping=aes(x = cut_Date, y = value,group =name,color = name),size = 2.2)+
 
-ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
-  geom_path(aes(color=name,linetype= name),size=1)+
-  geom_point(aes(color = name),size = 2.2)+
   scale_x_date(date_breaks = "1 month",
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-07-06")))+
-  scale_y_continuous(limits=c(0,ymax), expand = c(0, 0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-04")),expand = c(0,0))+
+
+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+
   theme(axis.title.x = element_blank(),
-        axis.line.x = element_blank(),
-        axis.line.x.top = element_blank(),
-        axis.line.y.right = element_blank(),
-        axis.line.y = element_blank(),
+        axis.line = element_blank(),
+        # axis.line.x.top = element_line(),
+        # axis.line.y.right = element_line(),
+        # axis.line.y = element_line(),
         axis.text = element_text(size = 14),
+        panel.border = element_rect(colour = "black", fill=NA, size=.8),
         panel.background = element_blank(),
         panel.grid.minor.x= element_line(size = 0.5, linetype = "dashed",
                                          colour = "#c1c1c1"),
-        panel.grid.minor.y= element_blank(),
-        panel.grid.major.y = element_line(size = 0.5, linetype = "dashed",
+        # panel.grid.major.x = element_line(size = 0.5, linetype = "dashed",
+        #                                   colour = "#c1c1c1"),
+        # panel.grid.minor.y= element_blank(),
+        panel.grid.minor.y = element_line(size = 0.5, linetype = "dashed",
                                           colour = "#c1c1c1"),
-        panel.border = element_rect(colour = "#58585a", fill=NA, size=1),
-        panel.spacing =  unit(0,"cm"),
+        # panel.border = element_rect(colour = "#58585a", fill=NA, size=1),
+        panel.spacing = unit(0,"cm"),
         legend.title=element_blank(),
         legend.text = element_text(size = 14,color="#58585A"),
         legend.position = "bottom",
-        legend.justification = 0,
+        legend.justification = .25,
         legend.key.width =  unit(1,"cm"),
-        legend.spacing.x = unit(.9, "cm"),
+        legend.spacing.x = unit(.5, "cm"),
         legend.spacing.y = unit(.9, "cm"),
         legend.key.size = unit(1, 'lines'),
         legend.key = element_rect(fill = NA),
-        plot.margin = unit(c(0, .1, 0, 0), "cm"),
+        plot.margin = unit(c(.1, .1, 0, 0), "cm"),
         legend.text.align = 0)+ ylab("Price (BDT)")+
   scale_color_manual(values = palette)+
   scale_linetype_manual(values = line_typ)
+
 
   ggsave(path = outputfolder_box,filename ="line_food_item.jpg" ,width=13,height=7,units="cm",scale = 1.8,dpi = 400)
 }
@@ -233,7 +246,7 @@ final_data_for_chart <- final_group_gather %>% dplyr::mutate(
 final_data_for_chart <-final_data_for_chart %>% arrange(order)
 final_data_for_chart$name <-factor(final_data_for_chart$name,unique(final_data_for_chart$name))
 
-ymax <- max(final_data_for_chart$value,na.rm = T)+5
+ymax <- max(final_data_for_chart$value,na.rm = T)+.5
 
 final_data_for_chart<- final_data_for_chart %>%
   mutate(
@@ -253,29 +266,41 @@ final_data_for_chart<- final_data_for_chart %>%
   )
 
 final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
+max_val<-max(final_data_for_chart$value,na.rm=T) %>% round(-1)+2
+rects <- data.frame(xstart = as.Date(c("2020-04-01","2020-05-01","2020-06-01","2020-07-01")),
+                    xend =as.Date(c("2020-05-01","2020-06-01","2020-07-01","2020-08-01")),col=rep(c("A","B"),2))
+ggplot() +
+  geom_rect(data=rects, mapping=aes(ymin=0, ymax=max_val, xmin=xstart,
+                                    xmax=xend, fill=col), alpha =0.2,show.legend = FALSE)+
+  scale_fill_manual(values=c("#b6b6b6","white"))+
+  geom_path(final_data_for_chart, mapping = aes(x = cut_Date, y = value,group =name,color=name,linetype= name),size=1) +
+  geom_point(final_data_for_chart,mapping=aes(x = cut_Date, y = value,group =name,color = name),size = 2.2)+
 
-ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
-  geom_path(aes(color=name,linetype= name),size=1)+
-  geom_point(aes(color = name),size = 2.2)+
   scale_x_date(date_breaks = "1 month",
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-07-08")))+
-  scale_y_continuous(limits=c(0,ymax), expand = c(0, 0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-04")),expand = c(0,0))+
+
+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+
   theme(axis.title.x = element_blank(),
-        axis.line.x = element_blank(),
-        axis.line.x.top = element_blank(),
-        axis.line.y.right = element_blank(),
-        axis.line.y = element_blank(),
+        axis.line = element_blank(),
+        # axis.line.x.top = element_line(),
+        # axis.line.y.right = element_line(),
+        # axis.line.y = element_line(),
         axis.text = element_text(size = 14),
+        panel.border = element_rect(colour = "black", fill=NA, size=.8),
         panel.background = element_blank(),
         panel.grid.minor.x= element_line(size = 0.5, linetype = "dashed",
                                          colour = "#c1c1c1"),
-        panel.grid.minor.y= element_blank(),
-        panel.grid.major.y = element_line(size = 0.5, linetype = "dashed",
+        # panel.grid.major.x = element_line(size = 0.5, linetype = "dashed",
+        #                                   colour = "#c1c1c1"),
+        # panel.grid.minor.y= element_blank(),
+        panel.grid.minor.y = element_line(size = 0.5, linetype = "dashed",
                                           colour = "#c1c1c1"),
-        panel.border = element_rect(colour = "#58585a", fill=NA, size=1),
+        # panel.border = element_rect(colour = "#58585a", fill=NA, size=1),
         panel.spacing = unit(0,"cm"),
         legend.title=element_blank(),
         legend.text = element_text(size = 14,color="#58585A"),
@@ -286,7 +311,7 @@ ggplot(final_data_for_chart, aes(x = cut_Date, y = value,group =name)) +
         legend.spacing.y = unit(.9, "cm"),
         legend.key.size = unit(1, 'lines'),
         legend.key = element_rect(fill = NA),
-        plot.margin = unit(c(0, .1, 0, 0), "cm"),
+        plot.margin = unit(c(.1, .1, 0, 0), "cm"),
         legend.text.align = 0)+ ylab("Price (BDT)")+
   scale_color_manual(values = palette)+
   scale_linetype_manual(values = line_typ)

@@ -147,10 +147,10 @@ current_round_opc <- read.csv(clean_data_file_paths[round_number], stringsAsFact
 prev_round_opc <- read.csv(clean_data_file_paths[round_number-1], stringsAsFactors = FALSE,
                            na.strings = c("", " ", NA))
 
-old_cols_names_opc <-c("dry_fish_sale_in_past_week" ,
-                       "cheapest_price_for_4mx5m_of_chicken",
-                       "cheapest_price_for_12__of_eggs",
-                       "price_of_1kg")
+old_cols_names_opc <-c("cheapest_price_for_1kg_of_dry_fish",
+                       "cheapest_price_for_1kg_of_chicken",
+                       "cheapest_price_for_12_of_eggs",
+                       "cheapest_price_for_1kg_rice")
 new_cols_names_opc <-c("cheapest_price_for_1kg_of_dry_fish",
                        "cheapest_price_for_1kg_of_chicken",
                        "cheapest_price_for_12_of_eggs",
@@ -186,9 +186,9 @@ final_summary <- final %>% group_by(round,key) %>% summarise(
 
 final_summary2 <-final_summary %>% spread("round","media_value")
 
-difference <- sum(final_summary2$`May - Week 3` )-sum(final_summary2$`May - Week 1` )
+difference <- sum(final_summary2$`June - Week 1` )-sum(final_summary2$`May - Week 3` )
 
-over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`May - Week 1` )*100)
+over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`May - Week 3` )*100)
 
 
 # combind -----------------------------------------------------------------

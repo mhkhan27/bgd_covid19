@@ -84,16 +84,17 @@ cols_to_analyze<-c(safety_measures,community_barriers,security_threats)
 dfsvy<-as_survey(current_round)
 dfsvy_prev<-as_survey(prev_round)
 
+
 current_analysis<-butteR::mean_proportion_table(design = dfsvy,list_of_variables = cols_to_analyze)
 prev_analysis<-butteR::mean_proportion_table(design = dfsvy_prev,list_of_variables = cols_to_analyze)
 
-cols_not_in_previous<-colnames(current_analysis)[!colnames(current_analysis) %in% colnames(prev_analysis)]
+# cols_not_in_previous<-colnames(current_analysis)[!colnames(current_analysis) %in% colnames(prev_analysis)]
 
-for(i in 1:length(cols_not_in_previous)){
-  col_temp<-cols_not_in_previous[i]
-  prev_analysis <- prev_analysis %>%
-    mutate(!!col_temp:= NA)
-}
+# for(i in 1:length(cols_not_in_previous)){
+  # col_temp<-cols_not_in_previous[i]
+  # prev_analysis <- prev_analysis %>%
+    # mutate(!!col_temp:= NA)
+# }
 
 prev_analysis <- prev_analysis%>% select(colnames(current_analysis))
 
@@ -133,6 +134,9 @@ selling_affected_table<-tibble(
                    "items_are_most_affected.powder",
                    "items_are_most_affected.lentils")
 )
+
+dfsvy$variables<- dfsvy$variables %>%
+  mutate_at(selling_affected_table$affected_item, ~ifelse(is.na(.),0,.))
 
 
 items_affected_subset_list<-list()
