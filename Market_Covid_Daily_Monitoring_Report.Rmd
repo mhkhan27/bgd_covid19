@@ -32,8 +32,8 @@ source("BGD_2020_Markets_Covid/scripts/functions/GIS_Project_Functions.R")
 source("BGD_2020_Markets_Covid/scripts/functions/Load_Audit.R")
 
 round_text<- "July - Week 1"
-date_log <- c("yes","no")[2]
-write_csv_output <-c("yes","no")[2]
+date_log <- c("yes","no")[1]
+write_csv_output <-c("yes","no")[1]
 day_to_run <- Sys.Date()
 
 
@@ -156,7 +156,7 @@ grt_thn_60 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some e
 ## Constraint 30
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
 cols_less_than_30 <- c ("days_of_stock_of_rice","restocking_time_of_rice","days_of_stock_of_cooking_oil",
-"restocking_time_of_cooking_oil","days_of_stock_of_lentils","restocking_time_of_lentils","restocking_time_of_leafy_greens","restocking_time_of_bananas","days_of_stock_of_eggs","restocking_time_of_eggs","restocking_time_of_dry_fish","restocking_time_of_soap","restocking_time_of_washing_powder","restocking_time_of_paracetamol","restocking_time_of_tarpaulin","restocking_time_of_chicken")
+"restocking_time_of_cooking_oil","days_of_stock_of_lentils","restocking_time_of_lentils","restocking_time_of_leafy_greens","restocking_time_of_bananas","days_of_stock_of_eggs","restocking_time_of_eggs","restocking_time_of_dry_fish","restocking_time_of_soap","restocking_time_of_washing_powder","restocking_time_of_paracetamol","restocking_time_of_tarpaulin","restocking_time_of_chicken","days_of_stock_of_dry_fish")
 
 grt_thn_30 <- main %>% dplyr::filter_at(vars(cols_less_than_30), any_vars(. > 30)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_30))
 
@@ -183,9 +183,7 @@ grt_thn_14 %>% kable( longtable = T, booktabs = T, linesep = "",caption= "Some e
 
 ## Constraint 7
 ```{r eval=TRUE, echo=FALSE, results='asis', warning=FALSE, messages=FALSE}
- cols_less_than_7 <- c("days_of_stock_of_leafy_greens",
-                       "days_of_stock_of_dry_fish",
-                       "days_of_stock_of_chicken")
+ cols_less_than_7 <- c("days_of_stock_of_leafy_greens","days_of_stock_of_chicken")
 
 grt_thn_7 <- main %>% dplyr::filter_at(vars(cols_less_than_7), any_vars(. > 7)) %>% dplyr::select(c("X_uuid","enumerator_id",cols_less_than_7))
 

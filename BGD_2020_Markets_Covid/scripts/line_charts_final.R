@@ -11,7 +11,7 @@ library(stringr)
 library(Hmisc)
 library(lubridate)
 
-items<- c("food_item","non_food_item")[2]
+items<- c("food_item","non_food_item")[1]
 
 # path --------------------------------------------------------------------
 
@@ -146,7 +146,8 @@ final_data_for_chart<- final_data_for_chart %>%
       round=="April - Week 3" ~"2020-04-20",
       round=="May - Week 1"~ "2020-05-04",
       round=="May - Week 3"~ "2020-05-18",
-      TRUE~"2020-06-07"
+      round == "June - Week 1" ~ "2020-06-07",
+      TRUE~"2020-07-07"
     ) %>% lubridate::ymd(),
     date_f=floor_date(date,"week"),
     date_c=ceiling_date(date,"week"),
@@ -159,8 +160,8 @@ final_data_for_chart<- final_data_for_chart %>%
 
 final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
 max_val<-max(final_data_for_chart$value,na.rm=T) %>% round(-1)+2
-rects <- data.frame(xstart = as.Date(c("2020-04-01","2020-05-01","2020-06-01","2020-07-01")),
-                    xend =as.Date(c("2020-05-01","2020-06-01","2020-07-01","2020-08-01")),col=rep(c("A","B"),2))
+rects <- data.frame(xstart = as.Date(c("2020-04-01","2020-05-01","2020-06-01","2020-07-01","2020-08-01","2020-09-01")),
+                    xend =as.Date(c("2020-05-01","2020-06-01","2020-07-01","2020-08-01","2020-09-01","2020-10-01")),col=rep(c("A","B"),3))
 ggplot() +
   geom_rect(data=rects, mapping=aes(ymin=0, ymax=max_val, xmin=xstart,
                                     xmax=xend, fill=col), alpha =0.2,show.legend = FALSE)+
@@ -172,7 +173,7 @@ ggplot() +
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-07-04")),expand = c(0,0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-16")),expand = c(0,0))+
 
 
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
@@ -254,7 +255,8 @@ final_data_for_chart<- final_data_for_chart %>%
       round=="April - Week 3" ~"2020-04-20",
       round=="May - Week 1"~ "2020-05-04",
       round=="May - Week 3"~ "2020-05-18",
-      TRUE~"2020-06-07"
+      round == "June - Week 1" ~ "2020-06-07",
+      TRUE~"2020-07-07"
     ) %>% lubridate::ymd(),
     date_f=floor_date(date,"week"),
     date_c=ceiling_date(date,"week"),
@@ -267,8 +269,8 @@ final_data_for_chart<- final_data_for_chart %>%
 
 final_data_for_chart<- final_data_for_chart %>% arrange(final_data_for_chart$cut_Date)
 max_val<-max(final_data_for_chart$value,na.rm=T) %>% round(-1)+2
-rects <- data.frame(xstart = as.Date(c("2020-04-01","2020-05-01","2020-06-01","2020-07-01")),
-                    xend =as.Date(c("2020-05-01","2020-06-01","2020-07-01","2020-08-01")),col=rep(c("A","B"),2))
+rects <- data.frame(xstart = as.Date(c("2020-04-01","2020-05-01","2020-06-01","2020-07-01","2020-08-01","2020-09-01")),
+                    xend =as.Date(c("2020-05-01","2020-06-01","2020-07-01","2020-08-01","2020-09-01","2020-10-01")),col=rep(c("A","B"),3))
 ggplot() +
   geom_rect(data=rects, mapping=aes(ymin=0, ymax=max_val, xmin=xstart,
                                     xmax=xend, fill=col), alpha =0.2,show.legend = FALSE)+
@@ -280,7 +282,7 @@ ggplot() +
                # date_labels = every_nth("%B",3),
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-07-04")),expand = c(0,0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-16")),expand = c(0,0))+
 
 
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+

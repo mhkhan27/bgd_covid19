@@ -132,7 +132,8 @@ final_data_for_chart<- final_data_for_chart %>%
       round=="April - Week 3" ~"2020-04-20",
       round=="May - Week 1"~ "2020-05-04",
       round=="May - Week 3"~ "2020-05-18",
-      TRUE~"2020-06-07"
+      round == "June - Week 1" ~ "2020-06-07",
+      TRUE~"2020-07-07"
     ) %>% lubridate::ymd(),
     date_f=floor_date(date,"week"),
     date_c=ceiling_date(date,"week"),
@@ -157,7 +158,7 @@ ggplot() +
   scale_x_date(date_breaks = "1 month",
                date_labels = ("%B"),
                date_minor_breaks = "1 week",
-               limits=c(as_date("2020-03-30"),as_date("2020-07-04")),expand = c(0,0))+
+               limits=c(as_date("2020-03-30"),as_date("2020-07-16")),expand = c(0,0))+
 
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
 

@@ -1,6 +1,6 @@
 
 #data_merge_multiround_comparisons.R & basic_analysis.R should run first
-#this script can run with Crlt + A, No change is required
+#need to change the differece calculation colums, No other change is required
 
 rm(list = ls())
 
@@ -186,9 +186,9 @@ final_summary <- final %>% group_by(round,key) %>% summarise(
 
 final_summary2 <-final_summary %>% spread("round","media_value")
 
-difference <- sum(final_summary2$`June - Week 1` )-sum(final_summary2$`May - Week 3` )
+difference <- sum(final_summary2$`July - Week 1` )-sum(final_summary2$`June - Week 1` )
 
-over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`May - Week 3` )*100)
+over_all_price_change <-data.frame( over_all_price_change = difference/sum(final_summary2$`June - Week 1` )*100)
 
 
 # combind -----------------------------------------------------------------

@@ -63,7 +63,7 @@ dfsvy$variables$upazilla<- forcats::fct_expand(dfsvy$variables$upazilla,c( "ukhi
 dfsvy$variables$shop_been_open_in_the_past_7_days<- forcats::fct_expand(dfsvy$variables$shop_been_open_in_the_past_7_days,
                                                                         c( "yes", "no"))
 
-cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit","dry_fish_unit",
+cols_to_sell <- c("sell_tarpaulin","sell_paracetamol","rice_unit","dry_fish_unit","assistance_items",
                   "lentils_unit","leafy_greens_unit","bananas_unit","oil_unit",
                   "soap_unit","washing_powder_unit","chicken_unit","eggs_unit")
 
@@ -95,7 +95,7 @@ dfsvy$variables$non_fresh_food_items_1<- forcats::fct_expand(dfsvy$variables$non
 
 # basic analysis ----------------------------------------------------------
 
-basic_analysis_overall<-butteR::mean_proportion_table(design = dfsvy,list_of_variables = cols_to_analyze)
+basic_analysis_overall<-butteR::mean_prop_working(design = dfsvy,list_of_variables = cols_to_analyze)
 
 
 

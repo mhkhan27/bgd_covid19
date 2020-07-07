@@ -130,7 +130,7 @@ return_top_sm<-function(df,
   }
   cols_to_rank<-df %>%
     select(starts_with(rank_col)) %>% colnames()
-  rank_cols_analyzed<- butteR::mean_proportion_table(design = df,list_of_variables = cols_to_rank, aggregation_level=aggregation_level)
+  rank_cols_analyzed<- butteR::mean_prop_working(design = df,list_of_variables = cols_to_rank, aggregation_level=aggregation_level)
 
   rank_table<- prepare_rank_table(rank_cols_analyzed = rank_cols_analyzed)
 

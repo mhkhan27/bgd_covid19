@@ -85,8 +85,8 @@ dfsvy<-as_survey(current_round)
 dfsvy_prev<-as_survey(prev_round)
 
 
-current_analysis<-butteR::mean_proportion_table(design = dfsvy,list_of_variables = cols_to_analyze)
-prev_analysis<-butteR::mean_proportion_table(design = dfsvy_prev,list_of_variables = cols_to_analyze)
+current_analysis<-butteR::mean_prop_working(design = dfsvy,list_of_variables = cols_to_analyze)
+prev_analysis<-butteR::mean_prop_working(design = dfsvy_prev,list_of_variables = cols_to_analyze)
 
 # cols_not_in_previous<-colnames(current_analysis)[!colnames(current_analysis) %in% colnames(prev_analysis)]
 
@@ -109,12 +109,13 @@ dm_output<-list()
 dm_output[["p3_tables"]]<-page_3_fs_dm
 
 
+if (sum(current_round$assistance_items == "yes")>0){
 selling_assistance_items<-current_round %>% select(starts_with("assistance_items_if_yes.")) %>% colnames()
-
 top_n_assistance_items<-return_top_sm(df = current_round,rank_col = "assistance_items_if_yes",rank_n = 3,
                                       xlsform_lookup = xls_lt)
 
 dm_output[["top_assistance_items"]]<-top_n_assistance_items$wide
+}
 
 selling_affected_table<-tibble(
 
@@ -143,7 +144,7 @@ items_affected_subset_list<-list()
 for(i in 1: nrow(selling_affected_table)){
   sell_item_yn<-selling_affected_table[i,1] %>% as.character()
   affected_item<-selling_affected_table[i,2] %>% as.character()
-  items_affected_subset_list[[i]]<-butteR::mean_proportion_table(design = dfsvy,list_of_variables =c(affected_item) ,aggregation_level = sell_item_yn) %>% filter(!!sym(sell_item_yn)=="yes") %>% select(-1)
+  items_affected_subset_list[[i]]<-butteR::mean_prop_working(design = dfsvy,list_of_variables =c(affected_item) ,aggregation_level = sell_item_yn) %>% filter(!!sym(sell_item_yn)=="yes") %>% select(-1)
 
 }
 
